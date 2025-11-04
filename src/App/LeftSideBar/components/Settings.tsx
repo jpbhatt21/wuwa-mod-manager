@@ -20,7 +20,7 @@ import {
 	CheckIcon,
 	Folder,
 } from "lucide-react";
-import { leftSidebarOpenAtom, localPresetListAtom, settingsDataAtom, localDataAtom } from "@/utils/vars";
+import { leftSidebarOpenAtom, localPresetListAtom, settingsDataAtom, localDataAtom, textDataAtom } from "@/utils/vars";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
@@ -36,7 +36,9 @@ import { readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
 import { logger } from "@/utils/logger";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { LANG_LIST, TEXT } from "@/utils/consts";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent } from "@/components/ui/alert-dialog";
 
 let keysdown: string[] = [];
 let keys: string[] = [];
@@ -49,15 +51,24 @@ function Settings({
 	disabled?: boolean;
 	setProgress?: Dispatch<SetStateAction<number[]>>;
 }) {
+	const [textData, setTextData] = useAtom(textDataAtom);
+	const [alertOpen, setAlertOpen] = useState(false);
+	const [langAlertData, setLangAlertData] = useState({ prev: "en", new: "jp" } as {
+		prev: keyof typeof TEXT;
+		new: keyof typeof TEXT;
+	});
 	const [presets, setPresets] = useAtom(localPresetListAtom);
 	const [settings, setSettings] = useAtom(settingsDataAtom);
 	const leftSidebarOpen = useAtomValue(leftSidebarOpenAtom);
 	const setLocalData = useSetAtom(localDataAtom);
+	useEffect(() => {
+		setTextData(TEXT[settings.lang || "en"] || TEXT.en);
+	}, [settings.lang]);
 	if (JSON.stringify(settings) == "{}") return <></>;
 	const importConfig = async () => {
 		try {
 			const filePath = await open({
-				title: "Select config file to import",
+				title: textData._LeftSideBar._components._Settings._ImportExport.ImportPop,
 				filters: [
 					{
 						name: "JSON files",
@@ -85,7 +96,7 @@ function Settings({
 		try {
 			const config = getConfig();
 			const filePath = await save({
-				title: "Export Config",
+				title: textData._LeftSideBar._components._Settings._ImportExport.ExportPop,
 				defaultPath: "config.json",
 				filters: [
 					{
@@ -107,7 +118,7 @@ function Settings({
 				<Button
 					onClick={() => {
 						setProgress &&
-							setProgress((prev:number[]) => {
+							setProgress((prev: number[]) => {
 								prev[1] = 1;
 								return [...prev];
 							});
@@ -116,22 +127,64 @@ function Settings({
 					style={{ width: leftSidebarOpen ? "" : "3rem" }}
 				>
 					<SettingsIcon />
-					{leftSidebarOpen && "Settings"}
+					{leftSidebarOpen && textData.generic.Settings}
 				</Button>
 			</DialogTrigger>
-			<DialogContent className="min-w-180 wuwa-ft min-h-150 bg-background/50 border-border gap -4 flex flex-col items-center p-4 overflow-hidden border-2 rounded-lg">
+			<DialogContent className="min-w-180 scale-95 wuwa-ft min-h-150 bg-background/50 border-border gap -4 flex flex-col items-center p-4 overflow-hidden border-2 rounded-lg">
+				<AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
+					<AlertDialogContent className="min-w-120 wuwa-ft bg-background/50 backdrop-blur-xs border-border flex flex-col items-center gap-4 p-4 overflow-hidden border-2 rounded-lg">
+						<div className=" flex flex-col items-center gap-6 mt-6 text-center">
+							<div className="text-xl flex gap-2 flex-col items-center justify-center text-gray-200">
+								{TEXT[langAlertData.prev].generic.Change +
+									TEXT[langAlertData.prev].generic.Languages[langAlertData.new]}
+								?
+								<Separator />
+								{TEXT[langAlertData.new].generic.Change + TEXT[langAlertData.new].generic.Languages[langAlertData.new]}?
+							</div>
+
+							{langAlertData.new!=="en" && <div className="max-w-96 text-accent gap-4 text-sm flex flex-col	">
+								<span>
+									{TEXT[langAlertData.prev].generic.Warning1 + " "}
+									{TEXT[langAlertData.prev].generic.Warning2}
+								</span>
+								<span>
+									{TEXT[langAlertData.new].generic.Warning1 + " "}
+									{TEXT[langAlertData.new].generic.Warning2}
+								</span>
+							</div>}
+						</div>
+						<div className="flex justify-between w-full gap-4 mt-4">
+							<AlertDialogCancel className="min-w-24 duration-300">
+								{TEXT[langAlertData.prev].generic.Cancel} | {TEXT[langAlertData.new].generic.Cancel}
+							</AlertDialogCancel>
+							<AlertDialogAction
+								className="min-w-24 text-accent hover:bg-accent hover:text-background"
+								onClick={() => {
+									setSettings((prev) => {
+										prev.lang = langAlertData.new
+										return { ...prev };
+									});
+									saveConfig();
+									setAlertOpen(false)
+								}}
+							>
+								{TEXT[langAlertData.prev].generic.Confirm} | {TEXT[langAlertData.new].generic.Confirm}
+							</AlertDialogAction>
+						</div>
+					</AlertDialogContent>
+				</AlertDialog>
 				<div className="min-h-fit text-accent my-6 text-3xl">
-					Settings
+					{textData.generic.Settings}
 					<Tooltip>
 						<TooltipTrigger></TooltipTrigger>
 						<TooltipContent className="opacity-0"></TooltipContent>
 					</Tooltip>
 				</div>
-				<div className="h-130 flex items-center w-full gap-4 p-0">
+				<div className="h-152 flex items-center w-full gap-4 p-0">
 					<div className="min-w-1/2 flex flex-col h-full gap-4 pr-4 overflow-y-auto border-r">
 						<div className="flex flex-col w-full gap-4">
 							<div className="flex items-center gap-1">
-								WWMI Auto Reload
+								{textData._LeftSideBar._components._Settings.AutoReload}
 								<Tooltip>
 									<TooltipTrigger>
 										<InfoIcon className="text-muted-foreground hover:text-gray-300 w-4 h-4" />
@@ -139,16 +192,18 @@ function Settings({
 									<TooltipContent>
 										<div className="flex flex-col gap-1">
 											<div>
-												<b>Disable -</b> Auto Reload Disabled
+												<b>{textData._LeftSideBar._components._Settings._AutoReload.Disable} -</b>{" "}
+												{textData._LeftSideBar._components._Settings._AutoReload.DisableMsg}
 											</div>
 											<div>
-												<b>WWMM -</b> Reload when WWMM is focused ★
+												<b>WWMM -</b> {textData._LeftSideBar._components._Settings._AutoReload.WWMMMsg}
 											</div>
 											<div>
-												<b>On Focus -</b> Reload when then Game is focused
+												<b>{textData._LeftSideBar._components._Settings._AutoReload.OnFocus} -</b>{" "}
+												{textData._LeftSideBar._components._Settings._AutoReload.FocusMsg}
 											</div>
 											<Separator />
-											<div>Please reload manually once on changing this.</div>
+											<div>{textData._LeftSideBar._components._Settings._AutoReload.ReloadMsg}</div>
 										</div>
 									</TooltipContent>
 								</Tooltip>
@@ -169,7 +224,7 @@ function Settings({
 								<TabsList className="bg-background/50 w-full">
 									<TabsTrigger value="0" className="w-1/3 h-10">
 										<CircleSlash />
-										Disable
+										{textData._LeftSideBar._components._Settings._AutoReload.Disable}
 									</TabsTrigger>
 									<TabsTrigger value="1" className="w-1/3 h-10">
 										<AppWindow />
@@ -177,13 +232,13 @@ function Settings({
 									</TabsTrigger>
 									<TabsTrigger value="2" className="w-1/3 h-10">
 										<Focus />
-										On Focus
+										{textData._LeftSideBar._components._Settings._AutoReload.OnFocus}
 									</TabsTrigger>
 								</TabsList>
 							</Tabs>
 						</div>
 						<div className="flex flex-col w-full gap-4">
-							<label className="min-w-fit">Toggle On</label>
+							<label className="min-w-fit">{textData._LeftSideBar._components._Settings.Toggle}</label>
 							<Tabs
 								defaultValue={settings.toggle.toString()}
 								className="w-full"
@@ -199,18 +254,19 @@ function Settings({
 									<TabsTrigger value="0" className="w-1/2 h-10">
 										<MousePointerClick className=" rotate-y-180 w-4 -mr-2" />
 										<Mouse />
-										Left Click
+										{textData._LeftSideBar._components._Settings._Toggle.LeftClick}
 									</TabsTrigger>
 									<TabsTrigger value="2" className="w-1/2 h-10">
 										<Mouse />
-										<MousePointerClick className=" w-4 -ml-2" /> Right Click
+										<MousePointerClick className=" w-4 -ml-2" />
+										{textData._LeftSideBar._components._Settings._Toggle.RightClick}
 									</TabsTrigger>
 								</TabsList>
 							</Tabs>
 						</div>
 						<div className="flex flex-col w-full gap-4">
 							<div className="flex items-center gap-1">
-								Online NSFW Content
+								{textData._LeftSideBar._components._Settings.NSFW}
 								<Tooltip>
 									<TooltipTrigger>
 										<InfoIcon className="text-muted-foreground hover:text-gray-300 w-4 h-4" />
@@ -218,13 +274,16 @@ function Settings({
 									<TooltipContent>
 										<div className="flex flex-col gap-1">
 											<div>
-												<b>Remove -</b> Filter out all NSFW content
+												<b>{textData._LeftSideBar._components._Settings._NSFW.Remove} -</b>{" "}
+												{textData._LeftSideBar._components._Settings._NSFW.RemoveMsg}
 											</div>
 											<div>
-												<b>Blur -</b> Click to unblur NSFW content ★
+												<b>{textData._LeftSideBar._components._Settings._NSFW.Blur} -</b>{" "}
+												{textData._LeftSideBar._components._Settings._NSFW.BlurMsg}
 											</div>
 											<div>
-												<b>Show -</b> Do not blur NSFW content
+												<b>{textData._LeftSideBar._components._Settings._NSFW.Show} -</b>{" "}
+												{textData._LeftSideBar._components._Settings._NSFW.ShowMsg}
 											</div>
 										</div>
 									</TooltipContent>
@@ -243,20 +302,23 @@ function Settings({
 							>
 								<TabsList className="bg-background/50 w-full">
 									<TabsTrigger value="0" className="w-1/3 h-10">
-										<EyeOffIcon className="aspect-square h-full pointer-events-none" /> Remove
+										<EyeOffIcon className="aspect-square h-full pointer-events-none" />{" "}
+										{textData._LeftSideBar._components._Settings._NSFW.Remove}
 									</TabsTrigger>
 									<TabsTrigger value="1" className="w-1/3 h-10">
-										<EyeClosedIcon className="aspect-square h-full pointer-events-none" /> Blur
+										<EyeClosedIcon className="aspect-square h-full pointer-events-none" />{" "}
+										{textData._LeftSideBar._components._Settings._NSFW.Blur}
 									</TabsTrigger>
 									<TabsTrigger value="2" className="w-1/3 h-10">
-										<EyeIcon className="aspect-square h-full pointer-events-none" /> Show
+										<EyeIcon className="aspect-square h-full pointer-events-none" />{" "}
+										{textData._LeftSideBar._components._Settings._NSFW.Show}
 									</TabsTrigger>
 								</TabsList>
 							</Tabs>
 						</div>
 						<div className="flex flex-col w-full gap-4 pt-2">
 							<div className="flex flex-col w-full gap-4">
-								Window BG Opacity
+								{textData._LeftSideBar._components._Settings.WindowBGOpacity}
 								<Slider
 									defaultValue={[settings.opacity * 100]}
 									max={100}
@@ -278,7 +340,7 @@ function Settings({
 							</div>
 						</div>
 						<div className="flex flex-col w-full gap-4">
-							<label>Background Type</label>
+							<label>{textData._LeftSideBar._components._Settings.BgType}</label>
 							<Tabs
 								defaultValue={settings.bgType.toString()}
 								onValueChange={(e) => {
@@ -292,20 +354,22 @@ function Settings({
 							>
 								<TabsList className="bg-background/50 w-full">
 									<TabsTrigger value="0" className="w-1/3 h-10">
-										<Square className="aspect-square h-full pointer-events-none" /> Blank
+										<Square className="aspect-square h-full pointer-events-none" />{" "}
+										{textData._LeftSideBar._components._Settings._BgType.Blank}
 									</TabsTrigger>
 									<TabsTrigger value="1" className="w-1/3 h-10">
-										<PauseIcon className="aspect-square h-full pointer-events-none" /> Static
+										<PauseIcon className="aspect-square h-full pointer-events-none" />{" "}
+										{textData._LeftSideBar._components._Settings._BgType.Static}
 									</TabsTrigger>
 									<TabsTrigger value="2" className="w-1/3 h-10">
 										<PlayIcon className="aspect-square h-full pointer-events-none" />
-										Dynamic
+										{textData._LeftSideBar._components._Settings._BgType.Dynamic}
 									</TabsTrigger>
 								</TabsList>
 							</Tabs>
 						</div>
 						<div className="flex flex-col w-full gap-4">
-							<label>Window Type</label>
+							<label>{textData._LeftSideBar._components._Settings.WindowType}</label>
 							<Tabs
 								defaultValue={settings.type.toString()}
 								onValueChange={(e) => {
@@ -320,22 +384,51 @@ function Settings({
 							>
 								<TabsList className="bg-background/50 w-full">
 									<TabsTrigger value="0" className="w-1/3 h-10">
-										<AppWindow className="aspect-square h-full pointer-events-none" /> Windowed
+										<AppWindow className="aspect-square h-full pointer-events-none" />{" "}
+										{textData._LeftSideBar._components._Settings._WindowType.Windowed}
 									</TabsTrigger>
 									<TabsTrigger value="1" className="w-1/3 h-10">
-										<Maximize className="aspect-square h-full pointer-events-none" /> Borderless
+										<Maximize className="aspect-square h-full pointer-events-none" />{" "}
+										{textData._LeftSideBar._components._Settings._WindowType.Borderless}
 									</TabsTrigger>
 									<TabsTrigger value="2" className="w-1/3 h-10">
-										<Maximize2 className="aspect-square h-full pointer-events-none" /> Maximized
+										<Maximize2 className="aspect-square h-full pointer-events-none" />{" "}
+										{textData._LeftSideBar._components._Settings._WindowType.Fullscreen}
 									</TabsTrigger>
 								</TabsList>
 							</Tabs>
+						</div>
+						<div className="flex flex-col w-full gap-4">
+							<label>{textData.generic.Language}</label>
+							<div className="flex justify-evenly ">
+								{LANG_LIST.map((lang) => (
+									<div
+										key={lang.Code}
+										className={`hover:brightness-150 -mt-2 flex-col flex items-center justify-center gap-1 text-sm duration-300 cursor-pointer select-none`}
+										onClick={() => {
+											if (settings.lang == lang.Code) return;
+											setLangAlertData({ prev: settings.lang || "en", new: lang.Code as keyof typeof TEXT });
+											setAlertOpen(true);
+										}}
+									>
+										<img src={lang.Flag} alt={lang.Name} className="w-6 h-6 duration-200 hover:scale-120" />
+										<span
+											className="overflow-hidden duration-200 mt-12 text-accent absolute whitespace-nowrap "
+											style={{
+												opacity: settings.lang == lang.Code ? "1" : "0",
+											}}
+										>
+											{lang.Name}
+										</span>
+									</div>
+								))}
+							</div>
 						</div>
 					</div>
 					<div className="min-w-1/2 flex flex-col h-full gap-4 pr-4 overflow-y-auto">
 						<div className="flex flex-col w-full gap-4">
 							<div className="flex flex-col w-full gap-4">
-								Import/Export Config
+								{textData._LeftSideBar._components._Settings.ImportExport}
 								<div className="flex justify-start w-full gap-2 pr-2">
 									<Button
 										disabled={disabled}
@@ -343,29 +436,29 @@ function Settings({
 										className="h-9 bg-input/30 hover:border-input border-input/0 text-muted-foreground hover:text-gray-300 w-1/2 text-sm border"
 									>
 										<Download className="w-4 h-4" />
-										Import
+										{textData._LeftSideBar._components._Settings._ImportExport.Import}
 									</Button>
 									<Button
 										onClick={exportConfig}
 										className="h-9 bg-input/30 hover:border-input border-input/0 text-muted-foreground hover:text-gray-300 w-1/2 text-sm border"
 									>
 										<Upload className="w-4 h-4" />
-										Export
+										{textData._LeftSideBar._components._Settings._ImportExport.Export}
 									</Button>
 								</div>
 							</div>
 						</div>
 						<div className="flex flex-col w-full gap-4">
 							<div className="flex items-center gap-1">
-								Launch Game
+								{textData._LeftSideBar._components._Settings.LaunchGame}
 								<Tooltip>
 									<TooltipTrigger>
 										<InfoIcon className="text-muted-foreground hover:text-gray-300 w-4 h-4" />
 									</TooltipTrigger>
 									<TooltipContent>
 										<div className="flex flex-col items-center gap-1">
-											<div>Launches the game via XXMI </div>
-											<div>when you start WWMM </div>
+											<div>{textData._LeftSideBar._components._Settings._LaunchGame.LaunchMsg1}</div>
+											<div>{textData._LeftSideBar._components._Settings._LaunchGame.LaunchMsg2}</div>
 										</div>
 									</TooltipContent>
 								</Tooltip>
@@ -384,10 +477,10 @@ function Settings({
 								<TabsList className="bg-background/50 w-full">
 									<TabsTrigger value="0" className="w-1/2 h-10">
 										<XIcon className=" rotate-y-180 w-4" />
-										Disable
+										{textData._LeftSideBar._components._Settings._AutoReload.Disable}
 									</TabsTrigger>
 									<TabsTrigger value="1" className="w-1/2 h-10">
-										<CheckIcon className=" w-4" /> Enable
+										<CheckIcon className=" w-4" /> {textData._LeftSideBar._components._Settings._AutoReload.Enable}
 									</TabsTrigger>
 								</TabsList>
 							</Tabs>
@@ -426,31 +519,34 @@ function Settings({
 						</div>
 						<div className="flex flex-col w-full h-full gap-2">
 							<div className="flex items-center gap-1">
-								Hot Key
+								{textData._LeftSideBar._components._Settings.HotKey}
 								<Tooltip>
 									<TooltipTrigger>
 										<InfoIcon className="text-muted-foreground hover:text-gray-300 w-4 h-4" />
 									</TooltipTrigger>
 									<TooltipContent>
 										<div className="flex flex-col gap-1">
-											<div>Works only when auto-reload is </div>
+											<div>{textData._LeftSideBar._components._Settings._HotKey.HKMsg1}</div>
 											<div>
-												set to <b>'WWMM'</b> or <b>'On Focus'</b>
+												{textData._LeftSideBar._components._Settings._HotKey.HKMsg2} <b>'WWMM'</b>{" "}
+												{textData._LeftSideBar._components._Settings._HotKey.HKMsg3}{" "}
+												<b>'{textData._LeftSideBar._components._Settings._AutoReload.OnFocus}'</b>
 											</div>
 											<Separator />
-											<div>Avoid using common shortcuts </div>
+											<div>{textData._LeftSideBar._components._Settings._HotKey.HKMsg4}</div>
 											<div>
-												such as <b>Ctrl+C</b>, <b>Alt+Tab</b>, etc...
+												{textData._LeftSideBar._components._Settings._HotKey.HKMsg5} <b>Ctrl+C</b>, <b>Alt+Tab</b>,{" "}
+												{textData._LeftSideBar._components._Settings._HotKey.HKMsg6}
 											</div>
 											<Separator />
 											<div>
-												<b>Backspace -</b> Clear hotkey{" "}
+												<b>Backspace -</b> {textData._LeftSideBar._components._Settings._HotKey.ClearHK}{" "}
 											</div>
 										</div>
 									</TooltipContent>
 								</Tooltip>
 							</div>
-							<div className="max-h-62 flex flex-col w-full h-full gap-1 p-2 ml-2 overflow-x-hidden overflow-y-auto ">
+							<div className="max-h-84 flex flex-col w-full h-full gap-1 p-2 ml-2 overflow-x-hidden overflow-y-auto ">
 								{presets.length > 0 ? (
 									presets.map((preset, index) => (
 										<div className="flex items-center justify-between w-full h-10 gap-2">
@@ -604,7 +700,7 @@ function Settings({
 									))
 								) : (
 									<div className="text-white/50 flex items-center justify-center w-full h-full">
-										Create a preset to set hotkeys.
+										{textData._LeftSideBar._components._Settings._HotKey.HKEmpty}
 									</div>
 								)}
 							</div>

@@ -2,10 +2,10 @@ import CardLocal from "@/App/Main/components/CardLocal";
 import { AnimatePresence, motion } from "motion/react";
 import { useLocalModState, useAppSettings } from "@/utils/commonHooks";
 import { ANIMATIONS, COMMON_STYLES, TRANSITIONS } from "@/utils/consts";
-import wwmm from "@/wwmm.png";
+
 import { useEffect, useState, useCallback } from "react";
-import { useSetAtom } from "jotai";
-import {  localDataAtom, rightSidebarOpenAtom } from "@/utils/vars";
+import { useAtomValue, useSetAtom } from "jotai";
+import {  localDataAtom, rightSidebarOpenAtom , textDataAtom } from "@/utils/vars";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent } from "@/components/ui/alert-dialog";
 import { deleteMod, refreshRootDir, saveConfig } from "@/utils/fsUtils";
 import { LocalData, LocalMod } from "@/utils/types";
@@ -13,7 +13,7 @@ import { LocalData, LocalMod } from "@/utils/types";
 
 function MainLocal({ online }: { online: boolean }) {
 	const { selectedItem, setSelectedItem, localFilteredItems, root, lastUpdated, setLocalModList } = useLocalModState();
-	
+	const textData= useAtomValue(textDataAtom)
 	const setLocalData = useSetAtom(localDataAtom);
 	const setRightSidebarOpen = useSetAtom(rightSidebarOpenAtom);
 	const [deleteItemData, setDeleteItemData] = useState<LocalMod | null>(null);
@@ -52,12 +52,12 @@ function MainLocal({ online }: { online: boolean }) {
 				<AlertDialogContent className="min-w-120 wuwa-ft bg-background/50 backdrop-blur-xs border-border flex flex-col items-center gap-4 p-4 overflow-hidden border-2 rounded-lg">
 					<div className="max-w-96 flex flex-col items-center gap-6 mt-6 text-center">
 						<div className="text-xl text-gray-200">
-							Delete <span className="text-accent">{deleteItemData?.name?.replaceAll("DISABLED_", "")}</span>?
+							{textData._Main._MainLocal.Delete} <span className="text-accent">{deleteItemData?.name?.replaceAll("DISABLED_", "")}</span>?
 						</div>
-						<div className="text-red-300	">This action is irreversible.</div>
+						<div className="text-red-300	">{textData._Main._MainLocal.Irrev}</div>
 					</div>
 					<div className="flex justify-between w-full gap-4 mt-4">
-						<AlertDialogCancel className="w-24 duration-300">Cancel</AlertDialogCancel>
+						<AlertDialogCancel className="w-24 duration-300">{textData.generic.Cancel}</AlertDialogCancel>
 						<AlertDialogAction
 							className="w-24 text-red-300 hover:bg-red-300 hover:text-background"
 							onClick={async () => {
@@ -76,7 +76,7 @@ function MainLocal({ online }: { online: boolean }) {
 								setLocalModList(items);
 								saveConfig();
 							}}>
-							Delete
+							{textData._Main._MainLocal.Delete}
 						</AlertDialogAction>
 					</div>
 				</AlertDialogContent>
@@ -87,7 +87,7 @@ function MainLocal({ online }: { online: boolean }) {
 						filter: alertOpen ? "blur(4px)  brightness(0.75)" : "blur(0px) brightness(1)",
 					}}>
 						{localFilteredItems.map((item, index) => (
-							<CardLocal key={item.truePath} {...{ item, root, wwmm, selectedItem, setSelectedItem, index, lastUpdated, settings, deleteItem }} />
+							<CardLocal key={item.truePath} {...{ item, root,  selectedItem, setSelectedItem, index, lastUpdated, settings, deleteItem }} />
 						))}
 					</motion.div>
 				)}

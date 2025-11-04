@@ -1,5 +1,5 @@
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel } from "@/components/ui/sidebar";
-import { leftSidebarOpenAtom, onlineModeAtom, tutorialModeAtom } from "@/utils/vars";
+import { leftSidebarOpenAtom, onlineModeAtom, tutorialModeAtom , textDataAtom } from "@/utils/vars";
 import Settings from "@/App/LeftSideBar/components/Settings";
 import Restore from "@/App/LeftSideBar/components/Restore";
 import { Globe, HardDriveDownload } from "lucide-react";
@@ -9,8 +9,8 @@ import LeftLocal from "@/App/LeftSideBar/LeftLocal";
 import { Button } from "@/components/ui/button";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useInstalledItemsManager } from "@/utils/commonHooks";
-import logo from "@/logo.png";
 function LeftSidebar() {
+	const textData = useAtomValue(textDataAtom);
 	const leftSidebarOpen = useAtomValue(leftSidebarOpenAtom);
 	const [online, setOnline] = useAtom(onlineModeAtom);
 	const setTutorialMode = useSetAtom(tutorialModeAtom);
@@ -26,7 +26,7 @@ function LeftSidebar() {
 							setTutorialMode(true);
 						}}
 						style={{
-							background: "url(" + logo + ")",
+							background: "url(/logo.png)",
 							backgroundSize: "contain",
 							backgroundRepeat: "no-repeat",
 							backgroundPosition: "center",
@@ -46,7 +46,7 @@ function LeftSidebar() {
 					style={{
 						minHeight: leftSidebarOpen ? "4.5rem" : "5.5rem",
 					}}>
-					<SidebarGroupLabel>Mode</SidebarGroupLabel>
+					<SidebarGroupLabel>{textData._LeftSideBar._Left.Mode}</SidebarGroupLabel>
 					<div
 						className="min-h-fit flex flex-row items-center justify-between w-full gap-2 px-2 overflow-hidden"
 						style={{
@@ -59,7 +59,7 @@ function LeftSidebar() {
 							className={"w-38.75 overflow-hidden text-ellipsis " + (!online && "hover:brightness-125 bg-accent text-background")}
 							style={{ width: leftSidebarOpen ? "" : "2.5rem" }}>
 							<HardDriveDownload className="w-6 h-6" />
-							{leftSidebarOpen && "Installed"}
+							{leftSidebarOpen && textData.generic.Installed}
 						</Button>
 						<Button
 							onClick={() => {
@@ -68,7 +68,7 @@ function LeftSidebar() {
 							className={"w-38.75 overflow-hidden text-ellipsis " + (online && "hover:brightness-125 bg-accent text-background")}
 							style={{ width: leftSidebarOpen ? "" : "2.5rem" }}>
 							<Globe className="w-6 h-6" />
-							{leftSidebarOpen && "Online"}
+							{leftSidebarOpen && textData._LeftSideBar._Left.Online}
 						</Button>
 					</div>
 				</SidebarGroup>

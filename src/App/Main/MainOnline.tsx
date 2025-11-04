@@ -1,4 +1,4 @@
-import { onlinePathAtom, onlineTypeAtom, settingsDataAtom } from "@/utils/vars";
+import { onlinePathAtom, onlineTypeAtom, settingsDataAtom  } from "@/utils/vars";
 import CardOnline from "@/App/Main/components/CardOnline";
 import { AnimatePresence, motion } from "motion/react";
 import { useAtomValue } from "jotai";
@@ -7,7 +7,6 @@ import Carousel from "./components/Carousel";
 import { useEffect, useState } from "react";
 import { Loader } from "lucide-react";
 import { ANIMATIONS, COMMON_STYLES } from "@/utils/consts";
-import wwmm from "@/wwmm.png";
 import { MainOnlineProps, OnlineMod } from "@/utils/types";
 
 function MainOnline({ max, count, online, loadMore }: MainOnlineProps) {
@@ -61,7 +60,6 @@ function MainOnline({ max, count, online, loadMore }: MainOnlineProps) {
                   key={`${item._sModelName}-${item._idRow}`}
                   {...item}
                   index={index}
-                  wwmm={wwmm}
                   now={now}
                   onModClick={onModClick}
 				  blur={nsfw==1}

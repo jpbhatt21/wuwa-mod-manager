@@ -1,7 +1,7 @@
 import { Loader, MessageSquare, Plus, ThumbsUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import Blur from "./Filter";
-import { getTimeDifference } from "@/utils/vars";
+import { getTimeDifference  } from "@/utils/vars";
 import { preventContextMenu, isDirectClick } from "@/utils/commonUtils";
 import { CSS_CLASSES, COMMON_STYLES, MOUSE_BUTTONS } from "@/utils/consts";
 import type { CardOnlineProps } from "@/utils/types";
@@ -9,7 +9,7 @@ function CardOnline(data: CardOnlineProps) {
   const isSelected = data.selected === true && data.position !== undefined;
   const backgroundImage = data._aPreviewMedia?._aImages?.[0] 
     ? `${data._aPreviewMedia._aImages[0]._sBaseUrl}/${data._aPreviewMedia._aImages[0]._sFile}`
-    : data.wwmm;
+    : "/wwmm.png";
   const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
     (e.currentTarget as HTMLElement).style.transform = "";
     if (!isDirectClick(e)) return;

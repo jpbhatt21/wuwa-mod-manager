@@ -5,7 +5,7 @@
  * @example
  * import { logger } from './logger';
  * 
- * logger.log('Debug info'); // Only in development
+ * //logger.log('Debug info'); // Only in development
  * logger.error('Critical error'); // Always shown
  * logger.warn('Warning message'); // Only in development
  */
@@ -18,11 +18,11 @@ class Logger {
   /**
    * Log a message (only in development)
    */
-  log(...args: unknown[]): void {
-    if (this.isDev) {
-      console.log(...args);
-    }
-  }
+  // log(...args: unknown[]): void {
+  //   if (this.isDev) {
+  //     //console.log(...args);
+  //   }
+  // }
 
   /**
    * Log a warning (only in development)
@@ -64,7 +64,7 @@ class Logger {
   logWithLevel(level: LogLevel, ...args: unknown[]): void {
     switch (level) {
       case 'log':
-        this.log(...args);
+        // this.log(...args);
         break;
       case 'warn':
         this.warn(...args);

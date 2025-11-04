@@ -1,7 +1,7 @@
 {
   "name": "wuwa-mod-manager",
   "private": true,
-  "version": "2.0.1",
+  "version": "2.0.4",
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -1,7 +1,10 @@
 import img2 from "@/demo/09_paste.png";
 import img3 from "@/demo/10_mod.png";
 import { ArrowRightIcon, MousePointerClickIcon, PlusIcon } from "lucide-react";
+import { useAtomValue } from "jotai";
+import { textDataAtom } from "@/utils/vars";
 function Page8({ setPage }: { setPage: (page: number) => void }) {
+	const text = useAtomValue(textDataAtom);
 	return (
 		<div
 			className="text-muted-foreground fixed flex flex-col items-center justify-center w-screen h-screen gap-16"
@@ -9,7 +12,7 @@ function Page8({ setPage }: { setPage: (page: number) => void }) {
 				setPage(8);
 			}}>
 			<div className=" text-3xl">
-				{"Viewing mods from a link".split("").map((letter, index) => (
+				{text._Tutorial.p8.Title.split("").map((letter, index) => (
 					<span
 						key={index}
 						className="wave-letter"
@@ -31,12 +34,12 @@ function Page8({ setPage }: { setPage: (page: number) => void }) {
 							<div className="bg-accent border border-sidebar text-sidebar rounded-md py-1 px-2.5">V</div>
 						</div>
 					</div>
-					<div className="text-muted-foreground/50 text-center">Paste anywhere in the WWMM window</div>
+					<div className="text-muted-foreground/50 text-center">{text._Tutorial.p8.Paste}</div>
 				</div>
 				<ArrowRightIcon className="text-accent w-8 h-8 -mt-4" />
 				<div className="flex flex-col gap-4">
 					<img src={img3} className="max-h-[66vh] rounded-lg border border-border shadow-lg" />
-					<div className="text-muted-foreground/50 text-center">Mod opens in Online Mode</div>
+					<div className="text-muted-foreground/50 text-center">{text._Tutorial.p8.Opens}</div>
 				</div>
 			</div>
 		</div>

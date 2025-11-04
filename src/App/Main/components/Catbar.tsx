@@ -1,9 +1,10 @@
-import { onlinePathAtom, localCategoryNameAtom, categoryListAtom, onlineTypeAtom, onlineSortAtom } from "@/utils/vars";
+import { onlinePathAtom, localCategoryNameAtom, categoryListAtom, onlineTypeAtom, onlineSortAtom , textDataAtom } from "@/utils/vars";
 import { FileQuestion, Group } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAtom, useAtomValue } from "jotai";
 import { LocalMod } from "@/utils/types";
 function Catbar({ online, items }: { online: boolean; items: LocalMod[] }) {
+	const textData = useAtomValue(textDataAtom)
 	const [selectedCategory, setSelectedCategory] = useAtom(localCategoryNameAtom);
 	const [onlinePath, setOnlinePath] = useAtom(onlinePathAtom);
 	const onlineType = useAtomValue(onlineTypeAtom);
@@ -14,7 +15,7 @@ function Catbar({ online, items }: { online: boolean; items: LocalMod[] }) {
 		<>
 			<div className="min-h-20 flex items-center justify-center w-full h-20 p-2">
 				<div className="bg-sidebar text-accent flex items-center justify-center w-full h-full gap-1 p-2 border rounded-lg">
-					<label className="w-20">Category</label>
+					<label className="w-20">{textData.generic.Category}</label>
 					<div
 						onWheel={(e) => {
 							if (e.deltaX != 0) return;
@@ -32,7 +33,7 @@ function Catbar({ online, items }: { online: boolean; items: LocalMod[] }) {
 							className={"w-24 " + ("All" == selectedCategory && " bg-accent text-background")}
 							style={{ scale: online ? "0" : "1", marginRight: online ? "-6.5rem" : "0rem", padding: online ? "0rem" : "" }}>
 							<Group className="aspect-square h-full pointer-events-none" />
-							All
+							{textData.generic.All}
 						</Button>
 						<Button
 							onClick={() => {
@@ -41,7 +42,7 @@ function Catbar({ online, items }: { online: boolean; items: LocalMod[] }) {
 							className={"min-w-34 " + ("Uncategorized" == selectedCategory && " bg-accent text-background")}
 							style={{ scale: online ? "0" : "1", marginRight: online ? "-9.5rem" : "0rem", padding: online ? "0rem" : "" }}>
 							<FileQuestion className="aspect-square h-full pointer-events-none" />
-							Uncategorized
+							{textData._Main._components._Catbar.Uncategorized}
 						</Button>
 						{(online ? categories : localCat).map((category) => (
 							<Button
@@ -62,7 +63,9 @@ function Catbar({ online, items }: { online: boolean; items: LocalMod[] }) {
 								}}
 								style={{ scale: online && category._special ? "0" : "1", marginRight: online && category._special ? "-9.5rem" : "0rem", padding: online && category._special ? "0rem" : "" }}
 								className={(online ? onlinePath.startsWith(`Skins/${category._sName}`) : selectedCategory == category._sName) ? " bg-accent text-background" : ""}>
-								<img className="aspect-square h-full rounded-full pointer-events-none" src={category._sIconUrl} />
+								<img className="aspect-square scale-120 h-full rounded-full pointer-events-none" onError={(e) => {
+															e.currentTarget.src = "/who.jpg";
+														}} src={category._sIconUrl || "err"} />
 								{category._sName}
 							</Button>
 						))}

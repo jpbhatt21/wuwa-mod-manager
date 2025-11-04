@@ -73,18 +73,18 @@ export async function registerGlobalHotkeys(): Promise<void> {
 	try {
 		await unregisterAll();
 	} catch (error) {
-		logger.log("Error unregistering hotkeys:", error);
+		//logger.log("Error unregistering hotkeys:", error);
 	}
 	
 	const currentPresets = store.get(localPresetListAtom);
 	const validHotkeys = currentPresets.filter((preset) => preset.hotkey && preset.hotkey.trim() !== "").map((preset) => preset.hotkey);
 	if (validHotkeys.length === 0) {
-		logger.log("No valid hotkeys found to register");
+		//logger.log("No valid hotkeys found to register");
 		return;
 	}
-	logger.log("Registering hotkeys:", validHotkeys);
+	//logger.log("Registering hotkeys:", validHotkeys);
 	await register(validHotkeys, (event) => {
-		logger.log("Hotkey pressed:", event);
+		//logger.log("Hotkey pressed:", event);
 		if (event.state === "Pressed") {
 			
 			const freshPresets = store.get(localPresetListAtom).filter(
@@ -106,7 +106,7 @@ export async function registerGlobalHotkeys(): Promise<void> {
 				return preset.hotkey.toLowerCase() === normalizedShortcut;
 			});
 			if (matchedPreset) {
-				logger.log("Matched preset:", matchedPreset);
+				//logger.log("Matched preset:", matchedPreset);
 				
 				
 				(async () => {
@@ -128,13 +128,13 @@ export async function registerGlobalHotkeys(): Promise<void> {
 						const updatedModList = await refreshRootDir("");
 						store.set(localModListAtom, updatedModList);
 						invoke('focus_mod_manager_send_f10_return_to_game')
-						logger.log("Preset applied successfully:", matchedPreset.name);
+						//logger.log("Preset applied successfully:", matchedPreset.name);
 					} catch (error) {
 						logger.error("Error applying preset:", error);
 					}
 				})();
 			} else {
-				logger.log("No matching preset found for hotkey:", normalizedShortcut);
+				//logger.log("No matching preset found for hotkey:", normalizedShortcut);
 			}
 		}
 	});

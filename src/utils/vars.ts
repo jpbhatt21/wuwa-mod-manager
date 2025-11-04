@@ -1,6 +1,19 @@
 import { FocusEvent, FocusEventHandler } from "react";
 import { atom, createStore } from "jotai";
-import type { TimeoutOrNull, Settings, DirRestructureItem, LocalData, Preset, LocalMod, Category, DownloadItem, OnlineData, InstalledListItem, UpdateInfo } from "./types";
+import type {
+	TimeoutOrNull,
+	Settings,
+	DirRestructureItem,
+	LocalData,
+	Preset,
+	LocalMod,
+	Category,
+	DownloadItem,
+	OnlineData,
+	InstalledListItem,
+	UpdateInfo,
+} from "./types";
+import { TEXT } from "./consts";
 
 function dontFocus(e: FocusEvent<HTMLInputElement, Element>): FocusEventHandler<HTMLInputElement> {
 	e.preventDefault();
@@ -10,6 +23,8 @@ function dontFocus(e: FocusEvent<HTMLInputElement, Element>): FocusEventHandler<
 }
 const previewUri = "http://127.0.0.1:5000/preview/";
 const store = createStore();
+export const languageAtom = atom("en" as "en" | "cn" | "ru" | "jp" | "kr");
+export const textDataAtom = atom(TEXT["jp"]);
 const firstLoadAtom = atom(false);
 const onlineModeAtom = atom(false);
 const leftSidebarOpenAtom = atom(true);
@@ -21,7 +36,12 @@ const modRootDirAtom = atom("");
 const settingsDataAtom = atom({} as Settings);
 const categoryListAtom = atom([] as Category[]);
 const progressOverlayDataAtom = atom({ title: "", open: false, finished: false });
-const consentOverlayDataAtom = atom({ title: "", from: [] as DirRestructureItem[], to: [] as DirRestructureItem[], next: false });
+const consentOverlayDataAtom = atom({
+	title: "",
+	from: [] as DirRestructureItem[],
+	to: [] as DirRestructureItem[],
+	next: false,
+});
 const localModListAtom = atom([] as LocalMod[]);
 const localFilteredModListAtom = atom([] as LocalMod[]);
 const localSearchTermAtom = atom("");
@@ -34,26 +54,41 @@ const localPathAtom = atom("");
 const localDataAtom = atom({} as LocalData);
 const installedItemsAtom = atom([] as InstalledListItem[]);
 const updateCacheAtom = atom({} as { [key: string]: number });
-const sortedInstalledItemsAtom = atom(
-	(get) => {
-		const items = get(installedItemsAtom);
-		return [...items].sort((a: InstalledListItem, b: InstalledListItem) => {
-			const flagDiff = b.modStatus - a.modStatus;
-			if (flagDiff !== 0) return flagDiff;
-			return a.name.toLocaleLowerCase().split("\\").slice(-1)[0].localeCompare(b.name.toLocaleLowerCase().split("\\").slice(-1)[0]);
-		});
-	}
-);
+const sortedInstalledItemsAtom = atom((get) => {
+	const items = get(installedItemsAtom);
+	return [...items].sort((a: InstalledListItem, b: InstalledListItem) => {
+		const flagDiff = b.modStatus - a.modStatus;
+		if (flagDiff !== 0) return flagDiff;
+		return a.name
+			.toLocaleLowerCase()
+			.split("\\")
+			.slice(-1)[0]
+			.localeCompare(b.name.toLocaleLowerCase().split("\\").slice(-1)[0]);
+	});
+});
 const onlinePathAtom = atom("home&type=Mod");
 export const apiRoutes = {
-	getCategoryList: () => "https://gamebanana.com/apiv11/Mod/Categories?_idCategoryRow=29524&_sSort=a_to_z&_bShowEmpty=true",
-	getGenericCategoryList: () => "https://gamebanana.com/apiv11/Mod/Categories?_idGameRow=20357&_sSort=a_to_z&_bShowEmpty=true",
-	home: ({sort = "default", page = 1,type=""}) => `https://gamebanana.com/apiv11/Game/20357/Subfeed?${type&&`_csvModelInclusions=${type}&`}_sSort=${sort}&_nPage=${page}`,
-	category: ({cat = "Skins", sort = "", page = 1}) => `https://gamebanana.com/apiv11/Mod/Index?_nPerpage=15&_aFilters%5BGeneric_Category%5D=${((cat.split("/").length > 1 ? store.get(categoryListAtom).find((x) => x._sName == cat.split("/")[1])?._idRow : genericCategories.find((x) => x._sName == cat.split("/")[0])?._idRow) || 0)}&_sSort=${sort}&_nPage=${page}`,
+	getCategoryList: () =>
+		"https://gamebanana.com/apiv11/Mod/Categories?_idCategoryRow=29524&_sSort=a_to_z&_bShowEmpty=true",
+	getGenericCategoryList: () =>
+		"https://gamebanana.com/apiv11/Mod/Categories?_idGameRow=20357&_sSort=a_to_z&_bShowEmpty=true",
+	home: ({ sort = "default", page = 1, type = "" }) =>
+		`https://gamebanana.com/apiv11/Game/20357/Subfeed?${
+			type && `_csvModelInclusions=${type}&`
+		}_sSort=${sort}&_nPage=${page}`,
+	category: ({ cat = "Skins", sort = "", page = 1 }) =>
+		`https://gamebanana.com/apiv11/Mod/Index?_nPerpage=15&_aFilters%5BGeneric_Category%5D=${
+			(cat.split("/").length > 1
+				? store.get(categoryListAtom).find((x) => x._sName == cat.split("/")[1])?._idRow
+				: genericCategories.find((x) => x._sName == cat.split("/")[0])?._idRow) || 0
+		}&_sSort=${sort}&_nPage=${page}`,
 	banner: () => "https://gamebanana.com/apiv11/Game/20357/TopSubs",
 	mod: (modTitle = "Mod/0") => `https://gamebanana.com/apiv11/${modTitle}/ProfilePage`,
 	modUpdates: (modTitle = "Mod/0") => `https://gamebanana.com/apiv11/${modTitle}/Updates?_nPage=1&_nPerpage=1`,
-	search: ({term, page = 1, type = ""}: {term: string, page?: number, type?: string}) => `https://gamebanana.com/apiv11/Util/Search/Results?_sModelName=${type}&_sOrder=best_match&_idGameRow=20357&_sSearchString=${encodeURIComponent(term)}&_nPage=${page}`,
+	search: ({ term, page = 1, type = "" }: { term: string; page?: number; type?: string }) =>
+		`https://gamebanana.com/apiv11/Util/Search/Results?_sModelName=${type}&_sOrder=best_match&_idGameRow=20357&_sSearchString=${encodeURIComponent(
+			term
+		)}&_nPage=${page}`,
 };
 const onlineTypeAtom = atom("Mod");
 const onlineSortAtom = atom("");
@@ -61,7 +96,7 @@ const onlineDataAtom = atom({ banner: [] } as OnlineData);
 const onlineDownloadListAtom = atom([] as DownloadItem[]);
 const onlineSelectedItemAtom = atom("-1");
 const tutorialModeAtom = atom(false);
-export const updaterOpenAtom = atom(false);	
+export const updaterOpenAtom = atom(false);
 const genericCategories = [
 	{
 		_idRow: 29524,
@@ -89,7 +124,6 @@ const genericCategories = [
 	},
 ];
 function getTimeDifference(startTimestamp: number, endTimestamp: number) {
-	
 	const secInMinute = 60;
 	const secInHour = secInMinute * 60;
 	const secInDay = secInHour * 24;
@@ -118,7 +152,7 @@ function hideUpdateInfo() {
 	infoBox.style.marginBottom = "-1.75rem";
 }
 
-export const updateWWMMAtom = atom(null as null|UpdateInfo);
+export const updateWWMMAtom = atom(null as null | UpdateInfo);
 
 export function updateInfo(text: string, duration = 5000) {
 	if (!infoBox) infoBox = document.getElementById("update-info") as HTMLDivElement;
@@ -128,4 +162,42 @@ export function updateInfo(text: string, duration = 5000) {
 	if (hideTimeout) clearTimeout(hideTimeout);
 	if (duration > 0) hideTimeout = setTimeout(hideUpdateInfo, duration);
 }
-export { tutorialModeAtom, localSearchTermAtom, onlineTypeAtom,onlineSortAtom, dontFocus, previewUri, store, firstLoadAtom, onlineModeAtom, leftSidebarOpenAtom, rightSidebarOpenAtom, introOpenAtom, tutorialPageAtom, refreshAppIdAtom, modRootDirAtom, settingsDataAtom, categoryListAtom, progressOverlayDataAtom, consentOverlayDataAtom, localModListAtom, localFilteredModListAtom, localPresetListAtom, localFilterNameAtom, localCategoryNameAtom, localSelectedModAtom, localSelectedPresetAtom, localPathAtom, localDataAtom, installedItemsAtom, updateCacheAtom, sortedInstalledItemsAtom, onlinePathAtom, onlineDataAtom, onlineDownloadListAtom, onlineSelectedItemAtom, genericCategories, getTimeDifference };
+export {
+	tutorialModeAtom,
+	localSearchTermAtom,
+	onlineTypeAtom,
+	onlineSortAtom,
+	dontFocus,
+	previewUri,
+	store,
+	firstLoadAtom,
+	onlineModeAtom,
+	leftSidebarOpenAtom,
+	rightSidebarOpenAtom,
+	introOpenAtom,
+	tutorialPageAtom,
+	refreshAppIdAtom,
+	modRootDirAtom,
+	settingsDataAtom,
+	categoryListAtom,
+	progressOverlayDataAtom,
+	consentOverlayDataAtom,
+	localModListAtom,
+	localFilteredModListAtom,
+	localPresetListAtom,
+	localFilterNameAtom,
+	localCategoryNameAtom,
+	localSelectedModAtom,
+	localSelectedPresetAtom,
+	localPathAtom,
+	localDataAtom,
+	installedItemsAtom,
+	updateCacheAtom,
+	sortedInstalledItemsAtom,
+	onlinePathAtom,
+	onlineDataAtom,
+	onlineDownloadListAtom,
+	onlineSelectedItemAtom,
+	genericCategories,
+	getTimeDifference,
+};

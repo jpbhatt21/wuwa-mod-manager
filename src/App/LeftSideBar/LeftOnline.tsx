@@ -1,4 +1,4 @@
-import { genericCategories, onlinePathAtom, leftSidebarOpenAtom, onlineModeAtom, onlineSelectedItemAtom, onlineTypeAtom, onlineSortAtom } from "@/utils/vars";
+import { genericCategories, onlinePathAtom, leftSidebarOpenAtom, onlineModeAtom, onlineSelectedItemAtom, onlineTypeAtom, onlineSortAtom , textDataAtom } from "@/utils/vars";
 import { AppWindow, EyeIcon, FolderCheckIcon, ShieldQuestion, Shirt, UploadIcon } from "lucide-react";
 import { SidebarContent, SidebarGroup, SidebarGroupLabel } from "@/components/ui/sidebar";
 import { modRouteFromURL } from "@/utils/fsUtils";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import Downloads from "./components/Downloads";
 import { Label } from "@/components/ui/label";
 function LeftOnline() {
+	const textData = useAtomValue(textDataAtom)
 	const [onlinePath, setOnlinePath] = useAtom(onlinePathAtom);
 	const leftSidebarOpen = useAtomValue(leftSidebarOpenAtom);
 	const onlineSort = useAtomValue(onlineSortAtom);
@@ -27,7 +28,7 @@ function LeftOnline() {
 				marginLeft: "-100%",
 			}}>
 			<SidebarGroup className="min-h-fit p-0">
-				<SidebarGroupLabel>Type</SidebarGroupLabel>
+				<SidebarGroupLabel>{textData._LeftSideBar._LeftOnline.Type}</SidebarGroupLabel>
 				<SidebarContent
 					className="flex flex-row items-center justify-between w-full gap-2 px-2 overflow-hidden"
 					style={{
@@ -63,7 +64,7 @@ function LeftOnline() {
 				}}
 			/>
 			<SidebarGroup>
-				<SidebarGroupLabel>Downloads</SidebarGroupLabel>
+				<SidebarGroupLabel>{textData.generic.Downloads}</SidebarGroupLabel>
 				<SidebarContent className="flex items-center justify-center w-full p-2">
 					<Downloads />
 				</SidebarContent>
@@ -81,7 +82,7 @@ function LeftOnline() {
 				style={{
 				height: `calc(100% - ${leftSidebarOpen ? "11.75rem" : "11.75rem"})`,
 			}}>
-				<SidebarGroupLabel className="flex items-center gap-1">Installed <Label className="text-accent/50 flex text-xs scale-75"><UploadIcon className="min-h-2 min-w-2 w-4 h-4" /> {installed.filter(item => item.modStatus===2).length} | <EyeIcon className="min-h-2 min-w-2 w-4 h-4" />{installed.filter(item => item.modStatus===1).length}</Label></SidebarGroupLabel>
+				<SidebarGroupLabel className="flex items-center gap-1">{textData.generic.Installed} <Label className="text-accent/50 flex text-xs scale-75"><UploadIcon className="min-h-2 min-w-2 w-4 h-4" /> {installed.filter(item => item.modStatus===2).length} | <EyeIcon className="min-h-2 min-w-2 w-4 h-4" />{installed.filter(item => item.modStatus===1).length}</Label></SidebarGroupLabel>
 				<SidebarContent className="min-w-14 flex flex-col items-center w-full max-h-full gap-2 pl-2 pr-1 overflow-hidden overflow-y-auto duration-200">
 					{installed.length > 0 ? (
 						<>
@@ -112,7 +113,7 @@ function LeftOnline() {
 						</>
 					) : (
 						<div key="loner" className="text-foreground/50 flex items-center justify-center w-64 h-12 duration-200 ease-linear">
-							{leftSidebarOpen ? "Nothing to show here." : "-"}
+							{leftSidebarOpen ? "---" : "-"}
 						</div>
 					)}
 				</SidebarContent>

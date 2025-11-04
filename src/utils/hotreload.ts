@@ -79,7 +79,7 @@ export function useHotreload() {
 export async function isGameProcessRunning(): Promise<boolean> {
 	try {
 		const isRunning = await invoke<boolean>("is_game_process_running");
-		logger.log(`Game process running: ${isRunning}`);
+		//logger.log(`Game process running: ${isRunning}`);
 		return isRunning;
 	} catch (error) {
 		logger.error("Failed to check if game process is running:", error);

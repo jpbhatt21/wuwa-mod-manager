@@ -254,7 +254,7 @@ a {
 	border-radius: 10px;
 }
 .bg-bgg {
-	background-image: url("./wwmm.png");
+	background-image: url("/wwmm.png");
 	background-size: 100px 100px;
 	background-repeat: repeat;
 	background-attachment: fixed;

@@ -1,10 +1,10 @@
-import logo from "@/logo.png";
-import { firstLoadAtom, tutorialModeAtom } from "@/utils/vars";
-import { useSetAtom } from "jotai";
+import { firstLoadAtom, tutorialModeAtom , textDataAtom } from "@/utils/vars";
+import { useSetAtom, useAtomValue } from "jotai";
 import { ArrowUpIcon } from "lucide-react";
 function Page9() {
 	const setTutorialMode = useSetAtom(tutorialModeAtom);
-	const setFirstLoad = useSetAtom(firstLoadAtom)
+	const setFirstLoad = useSetAtom(firstLoadAtom);
+	const text = useAtomValue(textDataAtom);
 	return (
 		<div
 			className="text-muted-foreground fixed flex flex-col items-center justify-center w-screen h-screen"
@@ -13,7 +13,7 @@ function Page9() {
 				setFirstLoad(false);
 			}}>
 			<div className="mb-8 text-3xl">
-				{"Tutorial Finished!".split("").map((letter, index) => (
+				{text._Tutorial.p9.Title.split("").map((letter, index) => (
 					<span
 						key={index}
 						className="wave-letter"
@@ -29,7 +29,7 @@ function Page9() {
 					id="WWMMLogo"
 					className="aspect-square h-20"
 					style={{
-						background: "url(" + logo + ")",
+						background: "url(/logo.png)",
 						backgroundSize: "contain",
 						backgroundRepeat: "no-repeat",
 						backgroundPosition: "center",
@@ -41,11 +41,11 @@ function Page9() {
 			</div>
 			<div className="text-muted-foreground/50 -ml-52 flex flex-col items-center -mt-4 text-sm">
 				<ArrowUpIcon className="h-8" />
-				<div>You can go through the tutorial again by</div>
-				<div> clicking on the App Icon on the top left</div>
+				<div>{text._Tutorial.p9.Again1}</div>
+				<div>{text._Tutorial.p9.Again2}</div>
 			</div>
-			<div className="text-muted-foreground/50 top-1 right-3 fixed text-sm">More interactive tutorials will be added in the future. Stay tuned!</div>
-			<div className="text-muted-foreground/50 bottom-8 fixed">Click anywhere to end the tutorial</div>
+			<div className="text-muted-foreground/50 top-1 right-3 fixed text-sm">{text._Tutorial.p9.More}</div>
+			<div className="text-muted-foreground/50 bottom-8 fixed">{text._Tutorial.p9.End}</div>
 		</div>
 	);
 }

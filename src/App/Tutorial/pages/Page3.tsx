@@ -3,11 +3,10 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { SidebarGroup } from "@/components/ui/sidebar";
 import { ArrowRightIcon, CheckIcon, ChevronDown, EditIcon, Folder, Link, XIcon } from "lucide-react";
-import wwmm from "@/wwmm.png";
 import { useState, useRef } from "react";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { useAtomValue } from "jotai";
-import { categoryListAtom } from "@/utils/vars";
+import { categoryListAtom , textDataAtom } from "@/utils/vars";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { COMMON_STYLES, CSS_CLASSES } from "@/utils/consts";
@@ -18,6 +17,7 @@ function Page3({ setPage }: { setPage: (page: number) => void }) {
 	const [popoverOpen, setPopoverOpen] = useState(false);
 	const [category, setCategory] = useState({ name: "-1", icon: "" });
 	const categories = useAtomValue(categoryListAtom);
+	const text = useAtomValue(textDataAtom);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [progress, setProgress] = useState(0);
 	const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,7 +51,7 @@ function Page3({ setPage }: { setPage: (page: number) => void }) {
 			<input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageSelect} style={{ display: "none" }} />
 			<div className="flex flex-col items-center justify-center w-full h-full gap-8">
 				<div className=" text-3xl">
-					{"Managing your Mods".split("").map((letter, index) => (
+					{text._Tutorial.p3.Title.split("").map((letter, index) => (
 						<span
 							key={index}
 							className="wave-letter"
@@ -72,7 +72,7 @@ function Page3({ setPage }: { setPage: (page: number) => void }) {
 						opacity:srcPath?"1":"0"
 					}}
 					src={srcPath} />
-					<img className="w-full h-[calc(100%-3.5rem)] -mt-71.5 duration-200 rounded-t-lg pointer-events-none object-cover" src={srcPath || wwmm} />
+					<img className="w-full h-[calc(100%-3.5rem)] -mt-71.5 duration-200 rounded-t-lg pointer-events-none object-cover" src={srcPath || "/wwmm.png"} />
 					<div className={CSS_CLASSES.BG_BACKDROP + " flex items-center w-full min-h-14 gap-2 px-4 py-1"}>
 						{<Folder />}
 						<Label id="mod-name" className={CSS_CLASSES.INPUT_TRANSPARENT} style={{ ...COMMON_STYLES.TRANSPARENT_BG }}>
@@ -90,8 +90,8 @@ function Page3({ setPage }: { setPage: (page: number) => void }) {
 			<div className="min-w-84 bg-sidebar h-full border-l">
 				<div className="flex flex-col h-full min-w-full gap-0 duration-300">
 					<div className="min-w-16 flex items-center justify-center h-16 gap-3 px-3 border-b">
-						<div className={`absolute flex -ml-156 gap-1 duration-300 ${progress > 0 && "opacity-0"}`}>
-							Rename the mod to <span className="text-accent">'My Mod'</span> <ArrowRightIcon />
+						<div className={`absolute flex right-86 gap-1 duration-300 ${progress > 0 && "opacity-0"}`}>
+							{text._Tutorial.p3.Rename} <span className="text-accent">'My Mod'</span> <ArrowRightIcon />
 						</div>
 						<Button className="bg-input/0 hover:bg-input/0 text-accent w-6 h-10 -mr-2">{<Folder className="scale-150" />}</Button>
 						<Input
@@ -119,26 +119,26 @@ function Page3({ setPage }: { setPage: (page: number) => void }) {
 						</div>
 					</div>
 					<SidebarGroup className="min-h-82 px-1 mt-1 select-none">
-						<div className={`absolute flex items-center -ml-85 mt-2 gap-1 duration-300 ${progress != 1 && "opacity-0"}`}>
-							Click on <EditIcon className="text-accent h-4" /> to change preview image <ArrowRightIcon />
+						<div className={`absolute flex items-center right-86 mt-2 gap-1 duration-300 ${progress != 1 && "opacity-0"}`}>
+							<Label className="min-w-fit flex items-center">{text._Tutorial.p3.ClickOn} <EditIcon className="text-accent h-4" /> {text._Tutorial.p3.PImg} <ArrowRightIcon className="min-h-4" /></Label> 
 						</div>
 						<EditIcon onClick={progress > 0 ? openFileSelector : undefined} className="min-h-12 min-w-12 bg-background/50 z-25 text-accent rounded-tr-md rounded-bl-md self-end w-12 p-3 -mb-12 border cursor-pointer" />
 						<img
 							id="preview"
 							className="w-82 h-82 bg-background object-cover duration-150 border rounded-lg"
 							onError={(e) => {
-								e.currentTarget.src = wwmm;
+								e.currentTarget.src = "/wwmm.png";
 							}}
 							src={srcPath}></img>
 					</SidebarGroup>
 					<SidebarGroup className="px-1 min-h-42.5 mt-1">
 						<div className="flex flex-col w-full border rounded-lg">
 							<div className="bg-pat2 flex items-center justify-between w-full p-1 rounded-lg">
-								<div className={`absolute flex -ml-66 gap-1 duration-300 ${progress != 2 && "opacity-0"}`}>
-									Set category to <span className="text-accent">'Camellya'</span>
-									<ArrowRightIcon />
+								<div className={`absolute flex right-86  items-center gap-1 duration-300 ${progress != 2 && "opacity-0"}`}>
+									<Label className="min-w-fit flex items-center">{text._Tutorial.p3.Cat} <span className="text-accent">'Camellya'</span>
+									<ArrowRightIcon className="min-h-4" /></Label>
 								</div>
-								<Button className=" h-12 bg-accent/0 hover:bg-accent/0   min-w-28.5 w-28.5 text-accent">Category</Button>
+								<Button className=" h-12 bg-accent/0 hover:bg-accent/0   min-w-28.5 w-28.5 text-accent">{text.generic.Category}</Button>
 								<Popover
 									open={popoverOpen}
 									onOpenChange={(open) => {
@@ -165,7 +165,7 @@ function Page3({ setPage }: { setPage: (page: number) => void }) {
 													<div className="w-30 text-ellipsis overflow-hidden break-words pointer-events-none">{category.name}</div>
 												</>
 											) : (
-												"Select"
+												text.generic.Select
 											)}
 											<ChevronDown />
 										</div>
@@ -174,7 +174,7 @@ function Page3({ setPage }: { setPage: (page: number) => void }) {
 										<Command>
 											<CommandInput placeholder="Search category..." className="h-12" />
 											<CommandList>
-												<CommandEmpty>No such category.</CommandEmpty>
+												<CommandEmpty>{text._RightSideBar._RightLocal.NoCat}</CommandEmpty>
 												<CommandGroup>
 													{categories.map((cat) => (
 														<CommandItem
@@ -212,7 +212,7 @@ function Page3({ setPage }: { setPage: (page: number) => void }) {
 								</Popover>
 							</div>
 							<div className="bg-pat1 flex justify-between w-full p-1 rounded-lg">
-								<Button className="bg-input/0 hover:bg-input/0 h-12 w-28.5 text-accent">Source</Button>
+								<Button className="bg-input/0 hover:bg-input/0 h-12 w-28.5 text-accent">{text._RightSideBar._RightLocal.Source}</Button>
 								<div className="w-48.5 flex items-center px-1">
 									<Input
 										type="text"
@@ -235,7 +235,7 @@ function Page3({ setPage }: { setPage: (page: number) => void }) {
 								</div>
 							</div>
 							<div className="bg-pat2 flex justify-between w-full p-1 rounded-lg">
-								<Button className="bg-input/0 hover:bg-input/0 h-12 w-28.5 text-accent">Note</Button>
+								<Button className="bg-input/0 hover:bg-input/0 h-12 w-28.5 text-accent">{text._RightSideBar._RightLocal.Notes}</Button>
 								<div className="w-48.5 flex items-center px-1">
 									<Input
 										type="text"
@@ -249,12 +249,12 @@ function Page3({ setPage }: { setPage: (page: number) => void }) {
 					</SidebarGroup>
 					<SidebarGroup className="px-1 my-1 duration-200">
 						<div className="flex flex-col w-full h-full overflow-hidden border rounded-lg">
-							<div className="bg-pat1 text-accent min-h-14 flex items-center justify-center w-full p-1 rounded-lg">Hot Keys</div>
+							<div className="bg-pat1 text-accent min-h-14 flex items-center justify-center w-full p-1 rounded-lg">{text._RightSideBar._RightLocal.HotKeys}</div>
 							<div className="w-full h-full">
 								<div className="text-gray-300 h-full max-h-[calc(100vh-39.75rem)] w-full overflow-y-auto overflow-x-hidden">
 									<div className="min-h-8 text-accent bg-pat2 flex items-center justify-center">
-										<label className="text-c w-1/2 px-4">Key</label>
-										<label className="text-c w-1/2 px-4">Action</label>
+										<label className="text-c w-1/2 px-4">{text._RightSideBar._RightLocal.Key}</label>
+										<label className="text-c w-1/2 px-4">{text._RightSideBar._RightLocal.Action}</label>
 									</div>
 									{keys?.map((hotkey, index) => (
 										<div key={index} className={"flex w-full items-center justify-center h-8 bg-pat" + (1 + (index % 2))}>

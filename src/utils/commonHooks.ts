@@ -21,26 +21,7 @@ import {
 } from './vars';
 import { InstalledListItem } from './types';
 import { modRouteFromURL } from './fsUtils';
-import { useEffect, useState } from 'react';
-
-/**
- * Custom hook for debouncing values
- */
-export function useDebouncedValue<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-}
+import { useEffect } from 'react';
 export function useLocalModState() {
   const [localModList, setLocalModList] = useAtom(localModListAtom);
   const [selectedItem, setSelectedItem] = useAtom(localSelectedModAtom);

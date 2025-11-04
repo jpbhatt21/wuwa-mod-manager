@@ -3,15 +3,18 @@ import { Label } from "@/components/ui/label";
 import { getCardClasses } from "@/utils/commonUtils";
 import { COMMON_STYLES, CSS_CLASSES } from "@/utils/consts";
 import { Folder, XIcon } from "lucide-react";
-import wwmm from "@/wwmm.png";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { useAtomValue } from "jotai";
+import { textDataAtom } from "@/utils/vars";
+
 function Page2({ setPage }: { setPage: (page: number) => void }) {
+	const text = useAtomValue(textDataAtom);
 	const [isEnabled, setIsEnabled] = useState(false);
 	return (
 		<div className="text-muted-foreground fixed flex flex-col items-center justify-center w-screen h-screen gap-8">
 			<div className="mb-4 text-3xl">
-				{"How to Toggle & Delete Mods".split("").map((letter, index) => (
+				{text._Tutorial.p2.Title.split("").map((letter, index) => (
 					<span
 						key={index}
 						className="wave-letter"
@@ -32,7 +35,7 @@ function Page2({ setPage }: { setPage: (page: number) => void }) {
 					setIsEnabled(!isEnabled);
 				}}>
 				<img className="object-cover w-full h-full opacity-0 pointer-events-none" src="" />
-				<img style={{ filter: isEnabled ? "brightness(1)" : "brightness(0.5) saturate(0.5)" }} className="w-full h-[calc(100%-3.5rem)] -mt-71.5 duration-200 rounded-t-lg pointer-events-none object-cover" src={wwmm} />
+				<img style={{ filter: isEnabled ? "brightness(1)" : "brightness(0.5) saturate(0.5)" }} className="w-full h-[calc(100%-3.5rem)] -mt-71.5 duration-200 rounded-t-lg pointer-events-none object-cover" src="/wwmm.png" />
 				<div className={CSS_CLASSES.BG_BACKDROP + " flex items-center w-full min-h-14 gap-2 px-4 py-1"}>
 					{<Folder style={{ filter: isEnabled ? "brightness(1)" : "brightness(0.5) saturate(0.5)" }} />}
 					<Label className={CSS_CLASSES.INPUT_TRANSPARENT} style={{ ...COMMON_STYLES.TRANSPARENT_BG, filter: isEnabled ? "brightness(1)" : "brightness(0.5) saturate(0.5)" }}>
@@ -50,14 +53,14 @@ function Page2({ setPage }: { setPage: (page: number) => void }) {
 						<AlertDialogContent className="min-w-120 backdrop-blur-xs wuwa-ft bg-background/50 border-border flex flex-col items-center gap-4 p-4 overflow-hidden border-2 rounded-lg">
 							<div className="max-w-96 flex flex-col items-center gap-6 mt-6 text-center">
 								<div className="text-xl text-gray-200">
-									Delete <span className="text-accent">Mod</span>?
+									{text._Main._MainLocal.Delete} <span className="text-accent">Mod</span>?
 								</div>
-								<div className="text-red-300	">This action is irreversible.</div>
+								<div className="text-red-300	">{text._Main._MainLocal.Irrev}</div>
 							</div>
 							<div className="flex justify-between w-full gap-4 mt-4">
-								<AlertDialogCancel className="w-24 duration-300">Cancel</AlertDialogCancel>
+								<AlertDialogCancel className="w-24 duration-300">{text.generic.Cancel}</AlertDialogCancel>
 								<AlertDialogAction className="w-24 text-red-300 hover:bg-red-300 hover:text-background" onClick={() => setPage(2)}>
-									Delete
+									{text._Main._MainLocal.Delete}
 								</AlertDialogAction>
 							</div>
 						</AlertDialogContent>
@@ -67,10 +70,10 @@ function Page2({ setPage }: { setPage: (page: number) => void }) {
 			<div className="text-muted-foreground/75 flex items-center gap-1 mt-8">
 				{isEnabled ? (
 					<>
-						Great! Now delete the mod by clicking <XIcon className="pointer-events-none max-h-5 text-red-300" /> on the top right
+						{text._Tutorial.p2.Great} <XIcon className="pointer-events-none max-h-5 text-red-300" /> {text._Tutorial.p2.OnTopRight}
 					</>
 				) : (
-					"Right click on a mod to toggle it on/off"
+					text._Tutorial.p2.RClick
 				)}
 			</div>
 		</div>

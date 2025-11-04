@@ -57,13 +57,11 @@ function Main({
 		}, 300);
 		return () => clearTimeout(timer);
 	}, [localSearchTerm]);
-	function loadMore(e: MouseEvent<HTMLDivElement, MouseEvent> | UIEvent<HTMLDivElement>) {
+	async function loadMore(e: MouseEvent<HTMLDivElement, MouseEvent> | UIEvent<HTMLDivElement>) {
 		let lastChild = e.currentTarget.lastElementChild?.lastElementChild as HTMLDivElement;
-		let self = e.currentTarget;
 		if (lastChild && !loading && online) {
-			let selfRect = self.getBoundingClientRect();
 			let lastChildRect = lastChild.getBoundingClientRect();
-			if (lastChildRect.top < selfRect.bottom) {
+			if (lastChildRect.top < window.innerHeight) {
 				loading = true;
 				pathPageCount[onlinePath]++;
 				if (max > 0 && pathPageCount[onlinePath] - 1 > max) {
@@ -73,17 +71,20 @@ function Main({
 				updateInfo(`Loading page ${pathPageCount[onlinePath]}/${Math.ceil(max)}`, 1000);
 				try {
 					if (onlinePath.startsWith("home"))
-						nextPage(apiRoutes.home({ page: pathPageCount[onlinePath], type: onlineType }), onlinePath);
+						await nextPage(apiRoutes.home({ page: pathPageCount[onlinePath], type: onlineType }), onlinePath);
 					else if (onlinePath.startsWith("Skins") || onlinePath.startsWith("Other") || onlinePath.startsWith("UI")) {
 						let cat = onlinePath.split("&_sort=")[0];
-						nextPage(apiRoutes.category({ cat, sort: onlineSort, page: pathPageCount[onlinePath] }), onlinePath);
+						await nextPage(apiRoutes.category({ cat, sort: onlineSort, page: pathPageCount[onlinePath] }), onlinePath);
 					} else if (onlinePath.startsWith("search/")) {
 						let term = onlinePath.replace("search/", "").split("&_type=")[0];
 						if (term.trim().length == 0) return;
-						nextPage(apiRoutes.search({ term, type: onlineType, page: pathPageCount[onlinePath] }), onlinePath);
+						await nextPage(apiRoutes.search({ term, type: onlineType, page: pathPageCount[onlinePath] }), onlinePath);
 					}
-				} catch (e) {
-					console.log(e);
+				} finally {
+					//console.log(e);
+					setTimeout(() => {
+						loadMore(e as unknown as MouseEvent<HTMLDivElement, MouseEvent>);
+					}, 100);
 					loading = false;
 				}
 			}
@@ -100,21 +101,26 @@ function Main({
 						...prev,
 					};
 				});
+				setTimeout(() => {
+					loadMore({ currentTarget: document.getElementById("online-items")! } as unknown as MouseEvent<
+						HTMLDivElement,
+						MouseEvent
+					>);
+				}, 100);
+
 				loading = false;
 			});
 	}
-	function nextPage(url: string, onlinePath: string) {
-		fetch(url)
-			.then((res) => res.json())
-			.then((data) => {
-				setOnlineData((prev) => {
-					prev[onlinePath] = [...prev[onlinePath], ...data._aRecords];
-					return {
-						...prev,
-					};
-				});
-				loading = false;
-			});
+	async function nextPage(url: string, onlinePath: string) {
+		const res = await fetch(url);
+		const data = await res.json();
+		setOnlineData((prev) => {
+			prev[onlinePath] = [...prev[onlinePath], ...data._aRecords];
+			return {
+				...prev,
+			};
+		});
+		loading = false;
 	}
 	useEffect(() => {
 		const items = localItems.filter(
@@ -133,21 +139,22 @@ function Main({
 				searchOptions: { prefix: true, fuzzy: 0.2 },
 			});
 		}
-		if(searchDB){
-		searchDB.removeAll();
-		searchDB.addAll(items);}
+		if (searchDB) {
+			searchDB.removeAll();
+			searchDB.addAll(items);
+		}
 		setIntermediateList(items);
 	}, [localFilter, localSelectedCategory, localItems]);
 	useEffect(() => {
-			if (debouncedSearchTerm.trim() === "" || !searchDB) {
-				setLocalFilteredItems(intermediateList);
-				return;
-			} else if (searchDB) {
-				const results = searchDB.search(debouncedSearchTerm);
-				console.log(results)
-				setLocalFilteredItems(results as unknown as LocalMod[]);
-			}
-		}, [debouncedSearchTerm, intermediateList]);
+		if (debouncedSearchTerm.trim() === "" || !searchDB) {
+			setLocalFilteredItems(intermediateList);
+			return;
+		} else if (searchDB) {
+			const results = searchDB.search(debouncedSearchTerm);
+			//console.log(results)
+			setLocalFilteredItems(results as unknown as LocalMod[]);
+		}
+	}, [debouncedSearchTerm, intermediateList]);
 	useEffect(() => {
 		const controller = new AbortController();
 		if (online && !pathPageCount[onlinePath]) {
@@ -158,7 +165,7 @@ function Main({
 					.then((res) => res.json())
 					.then((data) => {
 						setOnlineData((prev) => {
-							console.log(data);
+							//console.log(data);
 							return {
 								...prev,
 								banner: data,

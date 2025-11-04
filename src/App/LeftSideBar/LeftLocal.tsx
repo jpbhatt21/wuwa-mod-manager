@@ -1,4 +1,4 @@
-import { localFilterNameAtom, localSelectedPresetAtom } from "@/utils/vars";
+import { localFilterNameAtom, localSelectedPresetAtom , textDataAtom } from "@/utils/vars";
 import { SidebarContent, SidebarGroup, SidebarGroupLabel } from "@/components/ui/sidebar";
 import { refreshRootDir, applyPreset, saveConfig, selectRootDir } from "@/utils/fsUtils";
 import { Check, Circle, Edit, Folder, Plus, Save, X } from "lucide-react";
@@ -6,11 +6,12 @@ import { AnimatePresence, motion } from "motion/react";
 import { Separator } from "@radix-ui/react-separator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { Preset, LocalMod } from "@/utils/types";
 import { useLocalModState, useAppSettings, useSidebarState } from "@/utils/commonHooks";
 let focusedPresetIndex = -1;
 function LeftLocal() {
+	const textData = useAtomValue(textDataAtom)
 	const [localSelectedPreset, setLocalSelectedPreset] = useAtom(localSelectedPresetAtom);
 	const [localFilter, setLocalFilter] = useAtom(localFilterNameAtom);
 	const { localModList, setLocalModList, root: rootDir } = useLocalModState();
@@ -69,7 +70,7 @@ function LeftLocal() {
 				transitionDelay: online ? "0s" : "0.3s",
 			}}>
 			<SidebarGroup className=" p-0">
-				<SidebarGroupLabel>Filter</SidebarGroupLabel>
+				<SidebarGroupLabel>{textData._LeftSideBar._LeftLocal.Filter}</SidebarGroupLabel>
 				<SidebarContent
 					className="flex flex-row items-center justify-between w-full gap-2 px-2 overflow-hidden"
 					style={{
@@ -79,14 +80,17 @@ function LeftLocal() {
 						{
 							name: "All",
 							icon: <Circle className="aspect-square h-4" />,
+							text: textData.generic.All
 						},
 						{
 							name: "Enabled",
 							icon: <Check className="aspect-square h-4" />,
+							text: textData._LeftSideBar._LeftLocal._Filter.Enabled
 						},
 						{
 							name: "Disabled",
 							icon: <X className="aspect-square h-4" />,
+							text: textData._LeftSideBar._LeftLocal._Filter.Disabled
 						},
 					].map((fil) => (
 						<Button
@@ -97,7 +101,7 @@ function LeftLocal() {
 							className={"w-25 " + (localFilter == fil.name ? "bg-accent text-background " : "")}
 							style={{ width: leftSidebarOpen ? "" : "2.5rem" }}>
 							{fil.icon}
-							{leftSidebarOpen && fil.name}
+							{leftSidebarOpen && fil.text}
 						</Button>
 					))}
 				</SidebarContent>
@@ -111,7 +115,7 @@ function LeftLocal() {
 				}}
 			/>
 			<SidebarGroup className="">
-				<SidebarGroupLabel>Presets</SidebarGroupLabel>
+				<SidebarGroupLabel>{textData._LeftSideBar._LeftLocal.Presets}</SidebarGroupLabel>
 				<SidebarContent className="justify-evenly flex items-center w-full gap-0 overflow-hidden">
 					<div
 						className="min-w-14 thin justify-evenly flex flex-col items-center w-full gap-2 pl-2 overflow-hidden overflow-y-scroll duration-200"
@@ -179,7 +183,7 @@ function LeftLocal() {
 								))
 							) : (
 								<motion.div initial={{ opacity: 0, height: "0px" }} animate={{ opacity: 1, height: "2.5rem" }} key="loner" className="text-foreground/50 flex items-center justify-center w-64 h-10 overflow-hidden duration-200 ease-linear" style={{ opacity: leftSidebarOpen ? "" : "0", scale: leftSidebarOpen ? "" : "0", height: leftSidebarOpen ? "" : "0px" }}>
-									It's lonely here, create a preset!
+									{textData._LeftSideBar._LeftLocal._Presets.Empty}
 								</motion.div>
 							)}
 						</AnimatePresence>
@@ -198,7 +202,7 @@ function LeftLocal() {
 							}}>
 							<Plus className="w-6 h-6" />
 							<label className="duration-200 ease-linear" style={{ opacity: leftSidebarOpen ? "" : "0", width: leftSidebarOpen ? "2.5rem" : "0rem", marginRight: leftSidebarOpen ? "" : "-0.5rem" }}>
-								New
+								{textData._LeftSideBar._LeftLocal._Presets.New}
 							</label>
 						</Button>
 						<Button
@@ -214,7 +218,7 @@ function LeftLocal() {
 							style={{ width: leftSidebarOpen ? "" : "2.5rem" }}>
 							<Save className="w-6 h-6" />
 							<label className="duration-200 ease-linear" style={{ opacity: leftSidebarOpen ? "" : "0", width: leftSidebarOpen ? "2.5rem" : "0rem", marginRight: leftSidebarOpen ? "" : "-0.5rem" }}>
-								Save
+								{textData._LeftSideBar._LeftLocal._Presets.Save}
 							</label>
 						</Button>
 					</div>
@@ -229,7 +233,7 @@ function LeftLocal() {
 				}}
 			/>
 			<SidebarGroup>
-				<SidebarGroupLabel>Mod Directory</SidebarGroupLabel>
+				<SidebarGroupLabel>{textData._LeftSideBar._LeftLocal.ModDir}</SidebarGroupLabel>
 				<SidebarContent className="flex flex-row items-center w-full gap-2 px-2">
 					<Button
 						className="aspect-square flex items-center justify-center w-10 h-10"

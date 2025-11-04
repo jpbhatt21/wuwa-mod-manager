@@ -17,6 +17,86 @@ const PROGRESS_UPDATE_THRESHOLD: u64 = 1024;
 const BUFFER_SIZE: usize = 8192;
 const IMAGE_SERVER_PORT: u16 = 5000;
 
+/// Check if a directory is empty
+fn is_directory_empty(path: &Path) -> Result<bool, std::io::Error> {
+    if !path.exists() || !path.is_dir() {
+        return Ok(true); // Consider non-existent or non-directory as "empty"
+    }
+    
+    let mut entries = std::fs::read_dir(path)?;
+    Ok(entries.next().is_none())
+}
+
+/// Safely remove a file, only if the parent directory would become empty
+fn safe_remove_file(file_path: &Path) -> Result<(), String> {
+    if !file_path.exists() {
+        return Ok(());
+    }
+    
+    // Get the parent directory
+    if let Some(parent_dir) = file_path.parent() {
+        // First remove the file
+        remove_file(file_path).map_err(|e| e.to_string())?;
+        
+        // Then check if the parent directory is empty and remove it if so
+        if is_directory_empty(parent_dir).map_err(|e| e.to_string())? {
+            if let Err(e) = std::fs::remove_dir(parent_dir) {
+                log::warn!("Could not remove empty directory {:?}: {}", parent_dir, e);
+                // Don't return error here, as the main file removal succeeded
+            }
+        }
+    } else {
+        // No parent directory, just remove the file
+        remove_file(file_path).map_err(|e| e.to_string())?;
+    }
+    
+    Ok(())
+}
+
+/// Clean folder before extraction, keeping only preview files and the target archive
+fn clean_folder_before_extraction(folder_path: &Path, archive_file_name: &str) -> Result<(), String> {
+    let entries = std::fs::read_dir(folder_path).map_err(|e| e.to_string())?;
+    
+    for entry in entries {
+        let entry = entry.map_err(|e| e.to_string())?;
+        let file_path = entry.path();
+        
+        if file_path.is_file() {
+            let file_name = file_path.file_name()
+                .and_then(|n| n.to_str())
+                .unwrap_or("");
+            
+            // Keep the archive file itself
+            if file_name == archive_file_name {
+                continue;
+            }
+            
+            // Keep preview files (preview.* with any extension)
+            if file_name.starts_with("preview.") {
+                continue;
+            }
+            
+            // Delete everything else
+            log::info!("Cleaning up file before extraction: {}", file_name);
+            if let Err(e) = std::fs::remove_file(&file_path) {
+                log::warn!("Failed to remove file {}: {}", file_name, e);
+            }
+        } else if file_path.is_dir() {
+            let dir_name = file_path.file_name()
+                .and_then(|n| n.to_str())
+                .unwrap_or("");
+            
+            // Delete all directories
+            log::info!("Cleaning up directory before extraction: {}", dir_name);
+            if let Err(e) = std::fs::remove_dir_all(&file_path) {
+                log::warn!("Failed to remove directory {}: {}", dir_name, e);
+            }
+        }
+    }
+    
+    Ok(())
+}
+
 static SESSION_ID: AtomicU64 = AtomicU64::new(0);
 const MIME_EXTENSIONS: &[(&str, &str)] = &[
     ("image/jpeg", "jpg"),
@@ -177,6 +257,9 @@ async fn download_and_unzip(
     );
 
     if ext == "zip" {
+        // Clean folder before extraction
+        clean_folder_before_extraction(Path::new(&save_path), &file_name)?;
+        
         let zip_file = File::open(&file_path).map_err(|e| e.to_string())?;
         let mut archive = ZipArchive::new(zip_file).map_err(|e| e.to_string())?;
 
@@ -197,8 +280,11 @@ async fn download_and_unzip(
             }
         }
 
-        remove_file(&file_path).map_err(|e| e.to_string())?;
+        safe_remove_file(&file_path)?;
     } else if ext == "rar" {
+        // Clean folder before extraction
+        clean_folder_before_extraction(Path::new(&save_path), &file_name)?;
+        
         let mut archive = RarArchive::new(&file_path)
             .open_for_processing()
             .map_err(|e| e.to_string())?;
@@ -229,11 +315,13 @@ async fn download_and_unzip(
                 archive = header.skip().map_err(|e| e.to_string())?;
             }
         }
-        remove_file(file_path).map_err(|e| e.to_string())?;
+        safe_remove_file(&file_path)?;
     } else if ext == "7z" {
-        let del = file_path.to_owned();
-        decompress_file(file_path, save_path).expect("complete");
-        remove_file(del).map_err(|e| e.to_string())?;
+        // Clean folder before extraction
+        clean_folder_before_extraction(Path::new(&save_path), &file_name)?;
+        
+        decompress_file(&file_path, save_path).expect("complete");
+        safe_remove_file(&file_path)?;
     }
 
     let global_sid = SESSION_ID.load(Ordering::SeqCst);

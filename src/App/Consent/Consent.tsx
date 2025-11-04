@@ -1,4 +1,4 @@
-import { localModListAtom, consentOverlayDataAtom, introOpenAtom, tutorialPageAtom, modRootDirAtom, firstLoadAtom, tutorialModeAtom, updateInfo } from "@/utils/vars";
+import { localModListAtom, consentOverlayDataAtom, introOpenAtom, tutorialPageAtom, modRootDirAtom, firstLoadAtom, tutorialModeAtom, updateInfo , textDataAtom } from "@/utils/vars";
 import { saveConfig, createRestorePoint, refreshRootDir, selectRootDir } from "@/utils/fsUtils";
 import { ChevronRight, File, Folder, FolderCogIcon } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -10,6 +10,7 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { motion } from "motion/react";
 import { useEffect } from "react";
 function Consent() {
+	const textData = useAtomValue(textDataAtom);
 	const rootDir = useAtomValue(modRootDirAtom);
 	const [firstLoad, setFirstLoad] = useAtom(firstLoadAtom);
 	const [consentOverlayData, setConsentOverlayData] = useAtom(consentOverlayDataAtom);
@@ -41,7 +42,7 @@ function Consent() {
 				opacity: consentOverlayData.next ? 0 : 1,
 			}}>
 			<div className="w-180 h-164 bg-background/50 border-border flex flex-col items-center gap-4 p-4 overflow-hidden border-2 rounded-lg">
-				<div className="min-h-fit text-accent my-6 text-3xl">{consentOverlayData.title}</div>
+				<div className="min-h-fit text-accent my-6 text-3xl">{consentOverlayData.title == "Confirm changes"?textData._Consent._Consent.Confirm:consentOverlayData.title}</div>
 				<div className="flex flex-row items-center w-full gap-2 px-2">
 					<Button
 						className="aspect-square flex items-center justify-center w-10 h-10"
@@ -89,12 +90,12 @@ function Consent() {
 						onClick={() => {
 							invoke("exit_app");
 						}}>
-						Quit
+						{textData.generic.Quit}
 					</Button>
 					<div className="flex flex-col items-center justify-center w-full">
 						<div className=" flex items-center gap-2">
 							<Checkbox id="checkbox" className=" checked:bg-accent" />
-							<label className="text-accent/75 text-sm">Create a restore point before applying changes</label>
+							<label className="text-accent/75 text-sm">{textData._Consent._Consent.RestorePoint}</label>
 						</div>
 					</div>
 					<Button
@@ -108,7 +109,7 @@ function Consent() {
 								setConsentOverlayData((prev) => ({ ...prev, next: true }));
 							}
 						}}>
-						Confirm
+						{textData.generic.Confirm}
 					</Button>
 				</div>
 			</div>

@@ -1,5 +1,5 @@
 {
-	"version": "2.0.0",
+	"version": "2.0.4",
 	"dir": "",
 	"settings": {
 		"hotKeys": {
@@ -15,7 +15,9 @@
 		"listType": 0,
 		"onlineType":"Mod",
 		"nsfw":1,
-		"ignore":"2.0.0"
+		"ignore":"2.0.1",
+		"clientDate":"",
+		"lang":""
 		
 	},
 	"data": {},

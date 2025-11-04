@@ -1,9 +1,9 @@
-import { refreshAppIdAtom, localModListAtom, localPresetListAtom, settingsDataAtom, categoryListAtom, localDataAtom, consentOverlayDataAtom, progressOverlayDataAtom, modRootDirAtom, store } from "@/utils/vars";
+import { refreshAppIdAtom, localModListAtom, localPresetListAtom, settingsDataAtom, categoryListAtom, localDataAtom, consentOverlayDataAtom, progressOverlayDataAtom, modRootDirAtom, store  } from "@/utils/vars";
 import { readDir, readTextFile, writeTextFile, rename, exists, mkdir, remove, copyFile, DirEntry } from "@tauri-apps/plugin-fs";
 import { open } from "@tauri-apps/plugin-dialog";
 import { IGNORE, RESTORE, UNCATEGORIZED } from "@/utils/init";
 import { VERSION } from "./consts";
-import { SanitizeOptions, LocalMod, DirRestructureItem, LocalData, ModHotkey, Preset, Settings } from "./types";
+import { SanitizeOptions, LocalMod, DirRestructureItem, LocalData, ModHotkey, Preset, Settings } from "./types";	
 let root = "";
 let completedFiles = 0;
 let totalFiles = 0;
@@ -11,6 +11,16 @@ let canceled = false;
 let result = "Ok";
 const PRIORITY_KEYS = ["Alt", "Ctrl", "Shift", "Capslock", "Tab", "Up", "Down", "Left", "Right"];
 const PRIORITY_SET = new Set(PRIORITY_KEYS);
+const textMSG={
+	rem:"Removing current files",
+	disc:"Discovering files",
+	file:"File"
+}
+export function setTextMSG(val:{rem:string,disc:string,file:string}){
+	textMSG.rem=val.rem;
+	textMSG.disc=val.disc;
+	textMSG.file=val.file;
+}
 export function keySort(keys: string[]): string[] {
 	
 	const regularKeys = keys.filter((key) => !PRIORITY_SET.has(key));
@@ -136,7 +146,7 @@ async function copyDirWithProgress(source: string, destination: string, progress
 					const percentage = ((completedFiles / totalFiles) * 100).toFixed(2);
 					progressBar.style.width = percentage + "%";
 					progressPerct.innerText = percentage + "%";
-					progressMessage.innerText = `File ${completedFiles} of ${totalFiles}: ${entry.name} in ${source}`;
+					progressMessage.innerText = `${textMSG.file} ${completedFiles}/${totalFiles}: ${entry.name} in ${source}`;
 				}
 			}
 		}
@@ -171,7 +181,7 @@ async function countFilesInDir(path: string, messageBox: HTMLElement | null = nu
 		} else {
 			totalFiles++;
 			if (messageBox) {
-				messageBox.innerText = "Discovering files ( " + totalFiles + " / ? )";
+				messageBox.innerText = textMSG.disc+ " ( " + totalFiles + " / ? )";
 			}
 		}
 	}
@@ -244,11 +254,11 @@ export async function updateIni(num: 0 | 1) {
 			}
 			if (modified) {
 				await writeTextFile(iniPath, lines.join("\n"));
-				console.log(`Updated check_foreground_window to ${num} in d3dx.ini`);
+				//console.log(`Updated check_foreground_window to ${num} in d3dx.ini`);
 			}
 		}
 	} catch (e) {
-		console.log("Error updating d3dx.ini:", e);
+		//console.log("Error updating d3dx.ini:", e);
 	}
 }
 async function restructureDir(entries: LocalMod[]) {
@@ -256,17 +266,17 @@ async function restructureDir(entries: LocalMod[]) {
 	try {
 		await mkdir(joinPath(root, RESTORE));
 	} catch (e) {
-		console.log("Restore Folder already exists");
+		//console.log("Restore Folder already exists");
 	}
 	try {
 		await mkdir(joinPath(root, IGNORE));
 	} catch (e) {
-		console.log("Ignore Folder already exists");
+		//console.log("Ignore Folder already exists");
 	}
 	try {
 		await mkdir(joinPath(root, UNCATEGORIZED));
 	} catch (e) {
-		console.log("Folder Uncat already exists");
+		//console.log("Folder Uncat already exists");
 	}
 	entries = entries.filter((item) => item.name !== UNCATEGORIZED && item.name != IGNORE && item.name != RESTORE && categories.filter((category) => category._sName == item.name).length == 0);
 	for (let entry of entries) {
@@ -387,8 +397,11 @@ export async function validateModDownload(path: string) {
 				if (entry.isDirectory) dirs.push(entry.name);
 			}
 			if (!ini && dirs.length == 1) {
-				await copyDir(path + "\\" + dirs[0], path);
-				await removeDirRecursive(path + "\\" + dirs[0]);
+				let uuid ="WWMM_TEMP_"+(Math.random()*1000000000)
+				await rename(path + "\\" + dirs[0], path + "\\" + uuid);
+				await copyDir(path + "\\" + uuid,path);
+				await removeDirRecursive(path + "\\" + uuid);
+
 			}
 		}
 	} catch {}
@@ -488,6 +501,7 @@ export async function savePreviewImage(path: string) {
 	const file = await open({
 		multiple: false,
 		directory: false,
+		filters: [{ name: "Image", extensions: ["png", "jpg", "jpeg", "webp", "gif"] }],
 	});
 	if (!file) return;
 	let exts = ["png", "jpg", "jpeg", "webp", "gif"];
@@ -582,7 +596,7 @@ export async function createRestorePoint(prefix = "") {
 		progressMessage = progressMessage || document.querySelector("#restore-progress-message");
 		progressPerct = progressPerct || document.querySelector("#restore-progress-percentage");
 	}
-	progressMessage.innerText = "Discovering files";
+	progressMessage.innerText = textMSG.disc;
 	completedFiles = 0;
 	totalFiles = 0;
 	canceled = false;
@@ -626,7 +640,7 @@ export async function restoreFromPoint(name: string) {
 		progressMessage = progressMessage || document.querySelector("#restore-progress-message");
 		progressPerct = progressPerct || document.querySelector("#restore-progress-percentage");
 	}
-	progressMessage.innerText = "Removing current files";
+	progressMessage.innerText = textMSG.rem;
 	let entries = (await readDir(root)).filter((item) => item.name != RESTORE && item.name != IGNORE);
 	for (let entry of entries) {
 		try {
@@ -637,7 +651,7 @@ export async function restoreFromPoint(name: string) {
 			} catch {}
 		}
 	}
-	progressMessage.innerText = "Discovering files";
+	progressMessage.innerText = textMSG.disc;
 	completedFiles = 0;
 	totalFiles = 0;
 	canceled = false;

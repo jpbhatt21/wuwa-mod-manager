@@ -1,0 +1,11 @@
+{
+  "version": "2.0.4",
+  "notes": "{\"major\":[\"CRITICAL FIX - Selecting a language before other settings were loaded would break the app due to broken config file. It has been fixed now. Sorry for the inconvenience\",\"Added temporary category list to use if gamebanana is offline\"],\"minor\":[],\"patch\":[],\"cn\":{\"major\":[\"紧急修复 - 在其他设置加载之前选择语言会由于配置文件损坏而导致应用程序崩溃。现已修复。给您带来的不便，我们深表歉意\",\"添加临时分类列表，以便在GameBanana离线时使用\"],\"minor\":[],\"patch\":[]},\"ru\":{\"major\":[\"КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ - Выбор языка до загрузки других настроек приводил к поломке приложения из-за поврежденного файла конфигурации. Теперь это исправлено. Извините за неудобства\",\"Добавлен временный список категорий для использования, если GameBanana недоступен\"],\"minor\":[],\"patch\":[]},\"jp\":{\"major\":[\"重要修正 - 他の設定が読み込まれる前に言語を選択すると、設定ファイルの破損によりアプリが壊れる問題がありました。これは修正されました。ご不便をおかけして申し訳ありません\",\"GameBananaがオフラインの場合に使用する一時的なカテゴリリストを追加\"],\"minor\":[],\"patch\":[]},\"kr\":{\"major\":[\"중요 수정 - 다른 설정이 로드되기 전에 언어를 선택하면 설정 파일 손상으로 인해 앱이 중단되는 문제가 있었습니다. 이제 수정되었습니다. 불편을 끼쳐드려 죄송합니다\",\"GameBanana가 오프라인일 때 사용할 임시 카테고리 목록 추가\"],\"minor\":[],\"patch\":[]}}",
+  "pub_date": "2025-10-11T04:15:00Z",
+  "platforms": {
+    "windows-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRcHZDTEMvcmhGWEZlelZxRVN2WEJZUjFGMEpiSVBET3pGUVgyaFA0cDRmdHh4NXduclZRM0VyR00vVFlMWElkRlBkeWZxdWRXaXhOdmF2QnF4TDdSeE56R0Naa3EraUFzPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzYwMTU1NzM2CWZpbGU6V3V3YSBNb2QgTWFuYWdlciAoV1dNTSlfMi4wLjRfeDY0LXNldHVwLmV4ZQpSQ2tUQU9pbEV0bWtiNlRQVU9GTG5iTzFpWnF6RUxjWS9QaHgxM3pvZGNnekZFSHNHeHBrZWgzMjNHQitkbS9NcGVkUFNqYjh0TENFY0VWSllZdHdBdz09Cg==",
+      "url": "https://github.com/jpbhatt21/wuwa-mod-manager/releases/latest/download/Wuwa.Mod.Manager.WWMM._2.0.4_x64-setup.exe"
+    }
+  }
+}

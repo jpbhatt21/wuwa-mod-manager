@@ -4,7 +4,6 @@ import { MouseEvent, UIEvent } from "react";
 export interface CardLocalProps {
 	root: string;
 	item: LocalMod;
-	wwmm: string;
 	selectedItem: number;
 	setSelectedItem: (index: number) => void;
 	index: number;
@@ -99,6 +98,8 @@ export interface Settings {
 	onlineType: string;
 	nsfw: 0 | 1 | 2;
 	ignore: string;
+	clientDate: string;
+	lang: "en" | "cn" | "ru" | "jp" | "kr";
 }
 export interface DirRestructureItem {
 	name: string;

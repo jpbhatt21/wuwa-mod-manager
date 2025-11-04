@@ -10,7 +10,10 @@ import Page6 from "./pages/Page6";
 import Page7 from "./pages/Page7";
 import Page8 from "./pages/Page8";
 import Page9 from "./pages/Page9";
+import { useAtomValue } from "jotai";
+import { textDataAtom } from "@/utils/vars";
 function Tutorial() {
+	const textData = useAtomValue(textDataAtom)
 	const [page, setPage] = useState(0);
 	const pages = [<Page1 setPage={setPage} />, <Page2 setPage={setPage} />, <Page3 setPage={setPage} />, <Page4 setPage={setPage} />, <Page5 setPage={setPage} />, <Page6 setPage={setPage} />, <Page7 setPage={setPage} />, <Page8 setPage={setPage} />, <Page9 />];
 	return (
@@ -42,7 +45,7 @@ function Tutorial() {
 				}}
 				className="top-2 left-4 text-muted-foreground hover:text-accent fixed flex items-center gap-1 text-lg duration-300 cursor-pointer"
 				style={{ opacity: page === 8 ? 0 : 1, pointerEvents: page === 8 ? "none" : "auto" }}>
-				SKIP <SkipForwardIcon fill="currentColor" className="inline w-4 h-4 pointer-events-none" />
+				{textData._Tutorial.Skip} <SkipForwardIcon fill="currentColor" className="inline w-4 h-4 pointer-events-none" />
 			</div>
 		</motion.div>
 	);

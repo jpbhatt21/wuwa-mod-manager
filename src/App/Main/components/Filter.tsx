@@ -1,6 +1,9 @@
 import { Button } from "@/components/ui/button";
+import { textDataAtom } from "@/utils/vars";
+import { useAtomValue } from "jotai";
 import { EyeOff } from "lucide-react";
 function Blur({ blur }: { blur: boolean }) {
+	const textData = useAtomValue(textDataAtom)
 	return (
 		<div
 			className="flex items-center justify-center object-cover w-full h-full duration-200 bg-center pointer-events-none rounded-lg"
@@ -20,7 +23,7 @@ function Blur({ blur }: { blur: boolean }) {
 							parent.style.backdropFilter = "blur(0px)";
 						}
 					}}>
-					<EyeOff /> Show
+					<EyeOff /> {textData._Main._components._Filter.Show}
 				</Button>
 			)}
 		</div>

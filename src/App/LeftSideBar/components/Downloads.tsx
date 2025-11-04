@@ -1,4 +1,4 @@
-import { onlineDownloadListAtom, modRootDirAtom, localDataAtom, localModListAtom, leftSidebarOpenAtom} from "@/utils/vars";
+import { onlineDownloadListAtom, modRootDirAtom, localDataAtom, localModListAtom, leftSidebarOpenAtom, textDataAtom } from "@/utils/vars";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Check, Clock, FileQuestionIcon, Loader2, X } from "lucide-react";
 import { createModDownloadDir, sanitizeFileName, saveConfig, validateModDownload, refreshRootDir } from "@/utils/fsUtils";
@@ -19,6 +19,7 @@ const Icons = {
 	failed: <X className="min-h-4 min-w-4 text-red-300" />,
 };
 function Downloads() {
+	const textData = useAtomValue(textDataAtom);
 	const [onlineDownloadList, setOnlineDownloadList] = useAtom(onlineDownloadListAtom);
 	const [localData, setLocalData] = useAtom(localDataAtom);
 	const [dialogOpen, setDialogOpen] = useState(false);
@@ -154,13 +155,13 @@ function Downloads() {
 									<div className="min-w-79 fade-in flex items-center justify-center gap-1 pl-2 pointer-events-none">
 										{Icons[onlineDownloadList[0].status] || <FileQuestionIcon className="min-h-4 min-w-4" />}
 										<Label className="min-w-2 max-w-71.5 w-fit py-2 pr-2" style={{ backgroundColor: "#fff0" }}>
-											{onlineDownloadList[0].status == "downloading" ? `Downloading ${done + 1} of ${onlineDownloadList.length}` : `Downloaded ${done}/${onlineDownloadList.length}`}
+											{onlineDownloadList[0].status == "downloading" ? `${textData._LeftSideBar._components._Downloads.Downloading} ${done + 1} of ${onlineDownloadList.length}` : `${textData._LeftSideBar._components._Downloads.Downloaded} ${done}/${onlineDownloadList.length}`}
 										</Label>
 									</div>
 								</div>
 								<div key={"down2" + JSON.stringify(onlineDownloadList[0])} className="fade-in bg-button min-h-12 text-accent flex items-center justify-center w-full gap-1 pl-2 pointer-events-none">
 									{Icons[onlineDownloadList[0].status] || <FileQuestionIcon className="min-h-4 min-w-4" />}
-									<Label className=" w-fit max-w-72 pr-2 pointer-events-none">{onlineDownloadList[0].status == "downloading" ? `Downloading ${done + 1} of ${onlineDownloadList.length}` : `Downloaded ${done}/${onlineDownloadList.length}`}</Label>
+									<Label className=" w-fit max-w-72 pr-2 pointer-events-none">{onlineDownloadList[0].status == "downloading" ? `${textData._LeftSideBar._components._Downloads.Downloading} ${done + 1} of ${onlineDownloadList.length}` : `${textData._LeftSideBar._components._Downloads.Downloaded} ${done}/${onlineDownloadList.length}`}</Label>
 								</div>
 							</>
 						) : (
@@ -174,25 +175,25 @@ function Downloads() {
 										marginBottom: prev == 0 ? "-0.5rem" : "",
 										transition: "minHeight 0.3s, margin-bottom 0.3s, height 0.3s",
 									}}></div>
-								<Label className=" w-fit max-w-12 pointer-events-none">{onlineDownloadList[0].status == "downloading" ? `${done + 1} of ${onlineDownloadList.length}` : `${done}/${onlineDownloadList.length}`}</Label>
+								<Label className=" w-fit max-w-12 pointer-events-none">{ `${done + (onlineDownloadList[0].status == "downloading" ? 1 : 0)}/${onlineDownloadList.length}`}</Label>
 							</>
 						)}
 					</Button>
 				) : (
 					<>
 						<div key="loner" className="text-foreground/50 flex items-center justify-center w-64 h-full duration-200 ease-linear">
-							{leftSidebarOpen ? "No downloads in queue" : "-"}
+							{leftSidebarOpen ? textData._LeftSideBar._components._Downloads.NoQ : "-"}
 						</div>
 					</>
 				)}
 			</DialogTrigger>
 			<DialogContent className="min-w-180 wuwa-ft min-h-150 bg-background/50 border-border flex flex-col items-center gap-4 p-4 overflow-hidden border-2 rounded-lg">
-				<div className="min-h-fit text-accent my-6 text-3xl">Downloads</div>
+				<div className="min-h-fit text-accent my-6 text-3xl">{textData.generic.Downloads}</div>
 				<div className="h-100 flex flex-col items-center w-full gap-4 p-0">
 					<div className="flex justify-between w-full">
-						<div className="text-accent text-lg">Queue ({onlineDownloadList.length})</div>
+						<div className="text-accent text-lg">{`${textData._LeftSideBar._components._Downloads.Queue} (${onlineDownloadList.length})`}</div>
 						<Button variant="outline" size="sm" onClick={clearCompleted} disabled={!onlineDownloadList.some((item) => item.status === "completed" || item.status === "failed")}>
-							Clear Completed
+							{textData._LeftSideBar._components._Downloads.Clear}
 						</Button>
 					</div>
 					<div className="flex flex-col w-full h-full overflow-y-auto text-gray-300 border rounded-sm">
@@ -228,7 +229,7 @@ function Downloads() {
 								))}
 							</>
 						) : (
-							<div className="flex items-center justify-center h-32 text-gray-400">No downloads in queue</div>
+							<div className="flex items-center justify-center h-32 text-gray-400">{textData._LeftSideBar._components._Downloads.NoQ}</div>
 						)}
 					</div>
 				</div>

@@ -10,8 +10,8 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
-import { useAtom, useSetAtom } from "jotai";
-import { localSearchTermAtom, onlinePathAtom, onlineSortAtom, onlineTypeAtom, settingsDataAtom } from "@/utils/vars";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { localSearchTermAtom, onlinePathAtom, onlineSortAtom, onlineTypeAtom, settingsDataAtom , textDataAtom } from "@/utils/vars";
 import { Popover, PopoverTrigger } from "@/components/ui/popover";
 import { PopoverContent } from "@radix-ui/react-popover";
 import { saveConfig } from "@/utils/fsUtils";
@@ -30,6 +30,7 @@ function Navbar({
 	setRightSidebarOpen: Function,
 	online: boolean,
 }) {
+	const textData = useAtomValue(textDataAtom)
 	const setLocalSearchTerm = useSetAtom(localSearchTermAtom);
 	const [onlinePath, setOnlinePath] = useAtom(onlinePathAtom);
 	const [onlineType, setOnlineType] = useAtom(onlineTypeAtom);
@@ -115,24 +116,24 @@ function Navbar({
 							<div className="hover:brightness-150 bg-sidebar flex items-center justify-center w-full h-full gap-1 text-sm duration-300 cursor-pointer select-none">
 								{onlinePath.startsWith("home") || onlinePath.startsWith("search")
 									? onlineType == "Mod"
-										? "Mods Only"
+										? textData._Main._components._Navbar.ModsOnly
 										: "All"
 									: onlineSort == ""
 									? "Default"
 									: {
 											Generic_MostLiked: (
 												<>
-													Most <ThumbsUp className="h-4" />
+													{textData._Main._components._Navbar.Most} <ThumbsUp className="h-4" />
 												</>
 											),
 											Generic_MostViewed: (
 												<>
-													Most <EyeIcon className="h-4" />
+													{textData._Main._components._Navbar.Most} <EyeIcon className="h-4" />
 												</>
 											),
 											Generic_MostDownloaded: (
 												<>
-													Most <DownloadIcon className="h-4" />
+													{textData._Main._components._Navbar.Most} <DownloadIcon className="h-4" />
 												</>
 											),
 									  }[onlineSort]}
@@ -151,7 +152,7 @@ function Navbar({
 												saveConfig();
 											}}
 										>
-											All
+											{textData.generic.All}
 										</div>
 										<div
 											className="hover:brightness-150 bg-sidebar min-h-12 flex items-center justify-center w-full gap-1 text-sm duration-300 border-t cursor-pointer select-none"
@@ -162,7 +163,7 @@ function Navbar({
 												saveConfig();
 											}}
 										>
-											Mods Only
+											{textData._Main._components._Navbar.ModsOnly}
 										</div>
 									</>
 								) : (
@@ -174,7 +175,7 @@ function Navbar({
 												setOnlinePath((prev) => `${prev.split("&_sort=")[0]}&_sort=`);
 											}}
 										>
-											Default
+											{textData._Main._components._Navbar.Default}
 										</div>
 										<div
 											className="hover:brightness-150 border-y bg-sidebar min-h-12 flex items-center justify-center w-full gap-1 text-sm duration-300 cursor-pointer select-none"
@@ -183,7 +184,7 @@ function Navbar({
 												setOnlinePath((prev) => `${prev.split("&_sort=")[0]}&_sort=most_liked`);
 											}}
 										>
-											Most <ThumbsUp className="h-4" />
+											{textData._Main._components._Navbar.Most} <ThumbsUp className="h-4" />
 										</div>
 										<div
 											className="hover:brightness-150 border-y bg-sidebar min-h-12 flex items-center justify-center w-full gap-1 text-sm duration-300 cursor-pointer select-none"
@@ -192,7 +193,7 @@ function Navbar({
 												setOnlinePath((prev) => `${prev.split("&_sort=")[0]}&_sort=most_viewed`);
 											}}
 										>
-											Most <EyeIcon className="h-4" />
+											{textData._Main._components._Navbar.Most} <EyeIcon className="h-4" />
 										</div>
 										<div
 											className="hover:brightness-150 bg-sidebar min-h-12 flex items-center justify-center w-full gap-1 text-sm duration-300 border-t cursor-pointer select-none"
@@ -201,7 +202,7 @@ function Navbar({
 												setOnlinePath((prev) => `${prev.split("&_sort=")[0]}&_sort=most_downloaded`);
 											}}
 										>
-											Most <DownloadIcon className="h-4" />
+											{textData._Main._components._Navbar.Most} <DownloadIcon className="h-4" />
 										</div>
 									</>
 								)}

@@ -36,7 +36,7 @@ function App() {
 		}),
 		[rightSidebarOpen]
 	);
-	console.log(introOpen);
+	//console.log(introOpen);
 	return (
 		<div id="background" className="flex flex-row fixed justify-start items-start w-full h-full wuwa-ft">
 			<div
@@ -58,7 +58,7 @@ function App() {
 				<Main {...{ leftSidebarOpen, setLeftSidebarOpen, rightSidebarOpen, setRightSidebarOpen, online }} />
 				<div className="h-full duration-200 ease-linear" style={rightSidebarStyle} />
 			</div>
-			<AnimatePresence>{introOpen && <Intro />}</AnimatePresence>
+			<AnimatePresence>{(introOpen || !settings.lang) && <Intro />}</AnimatePresence>
 			<AnimatePresence>{plannedChanges.title && <Consent />}</AnimatePresence>
 			<AnimatePresence>{restoreInfo.open && <Progress />}</AnimatePresence>
 			<AnimatePresence>{tutorialMode && <Tutorial />}</AnimatePresence>

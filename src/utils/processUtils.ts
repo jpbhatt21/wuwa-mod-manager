@@ -7,7 +7,7 @@ export async function executeWithArgs(exePath: string, args: string[]): Promise<
 			exePath: exePath, 
 			args: args 
 		});
-		logger.log(`Successfully executed: ${exePath} with args:`, args);
+		//logger.log(`Successfully executed: ${exePath} with args:`, args);
 		return result;
 	} catch (error) {
 		logger.error(`Failed to execute ${exePath}:`, error);

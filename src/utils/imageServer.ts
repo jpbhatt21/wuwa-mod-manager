@@ -43,7 +43,7 @@ export async function checkImageServerHealth(): Promise<boolean> {
 export function setupImageServerListeners() {
   
   listen<string>('image-server-ready', (event) => {
-    logger.log('Image server is ready:', event.payload);
+    //logger.log('Image server is ready:', event.payload);
     imageServerUrl = event.payload;
   });
   
